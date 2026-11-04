@@ -1,0 +1,20 @@
+
+> delilah-reply-assistant@4.2.0 test
+> node --test test-references.mjs && node test-vault.mjs && node test-workflow.mjs
+
+✔ voice baseline, bounded retrieval and page/hash provenance (21.285469ms)
+✔ unselected reference claims rejected; audit distinguishes supply from reported use (3.947946ms)
+✔ live request receives actual passages; untrusted client sources cannot override retrieval (11.597657ms)
+✔ reference catalog is protected and raw source files are not served (76.671195ms)
+✔ private references are scoped to the supplied request and disabled entries excluded (10.337375ms)
+✔ API rejects screenshot generation without style confirmation (2.907558ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 354.815496
+PASS: REAL AES-GCM vault encryption, isolation, persistence, wrong-password rejection, deletion and preserved username casing
+PASS: screenshot choice resets, Yes requires confirmation, No retains settings, seven tiles and collapsed advanced controls (simulated DOM, not visual browser testing).

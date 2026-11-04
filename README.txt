@@ -1,3 +1,10 @@
+DELILAH REPLY ASSISTANT V4.3 — IN-PLACE V4 UPGRADE
+================================================
+
+READ START_HERE.md AND UPGRADE_V4_3.md FIRST.
+This package REPLACES the existing V4 app using the same hosting service and site address.
+It does not create a second app or migrate local data across site origins automatically.
+
 DELILAH REPLY ASSISTANT V4 — BUYER CHAT ROUTING
 ===============================================
 
@@ -136,9 +143,3 @@ PERSONAL BUILD UPDATE — NOVEMBER 4, 2026
 Checks: node --test test-references.mjs; node test-vault.mjs;
 node test-workflow.mjs. The workflow test uses a simulated DOM and is not visual
 browser testing. Live API, physical phone and hosted deployment remain untested.
-
-ACCOUNT SIGN-IN
-The personal app opens at a username/password screen. Username defaults to Delilah; set APP_USERNAME on the server to customize it. The password is the existing APP_PASSCODE environment variable. Public self-registration and separate customer accounts are not enabled in this personal version.
-Remember me uses an HttpOnly, SameSite=Strict cookie (Secure on public hosting) renewed when the app opens, with a browser-compatible 400-day lifetime. Clearing browser data, signing out, credential changes, or browser policy can require sign-in again. No login password is saved in browser storage.
-New local buyer memory is automatically encrypted with the login password. A remembered device stores a nonextractable CryptoKey in IndexedDB, bound to the account credential version, vault salt and session expiry. It unlocks memory automatically only after a valid server session. Sign out or Lock memory clears the remembered key. Existing memory with another passphrase is preserved and asks for its old passphrase once; after successful unlock it is re-encrypted under the login password. An encrypted backup made before migration still requires its original passphrase.
-Private buyer histories remain local to this browser/device; this change does not add cloud synchronization or password recovery.

@@ -73,44 +73,44 @@
 @media(max-width:540px){.buyer-chat-panel{padding:19px 15px}.chat-list{grid-template-columns:1fr;max-height:260px}.chat-toolbar input{max-width:none}.chat-count{width:100%;margin-left:0}}
 .persona-option[aria-pressed=true]{outline:2px solid var(--pink)}.persona-option[aria-pressed=true] b::after{content:' ✓'}#private-reference-list .action-row{flex-wrap:wrap}#private-reference-list label{overflow-wrap:anywhere;max-width:100%}input[type=file]{max-width:100%}
 
-[hidden]{display:none!important}.login-screen{min-height:100dvh;display:grid;place-items:center;padding:24px}.login-card{width:100%;max-width:420px;border:1px solid var(--edge);border-radius:24px;padding:32px;background:var(--panel);box-shadow:0 22px 55px #0004}.login-card h1{font-size:40px;margin:20px 0 10px}.login-card p{color:var(--muted);font-size:14px;line-height:1.6}.login-card .generate{margin-top:20px}.login-error{color:#ffd5dc!important;min-height:24px}.account-bar{display:flex;align-items:center;gap:14px;justify-content:flex-end;padding:12px 0;color:var(--muted);font-size:12px}
-.hero{padding:26px 4px 22px}.hero h1{font-size:42px;margin:12px 0}.hero-pills{display:none}.app-settings{margin-top:22px}.app-settings>summary{cursor:pointer;font-weight:700;color:var(--pink)}.app-settings .vault-banner{margin-top:20px}.chat-meta{line-height:1.7}.copy-btn{min-height:44px;padding:12px 18px}.results-panel .section-helper{margin-bottom:14px}@media(max-width:570px){.hero{padding:22px 0 18px}.hero h1{font-size:34px}}
-#app-shell{padding-top:env(safe-area-inset-top,0px)}.account-bar{justify-content:space-between;flex-wrap:wrap;padding:14px 0 18px;gap:12px}.account-bar #sign-out{min-height:48px;min-width:104px;padding:12px 20px;touch-action:manipulation}.account-bar #account-label{font-size:13px}.login-screen{padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+/* V4.3: daily-use first. Complete original controls retained under Menu. */
+.nav-menu{margin-left:auto;margin-right:12px;white-space:nowrap}.voice-revision{margin:22px 0;border:1px solid #835e81;border-radius:17px;background:#2a1e30;padding:18px}.voice-revision[hidden]{display:none}.voice-revision h3{font:normal 23px Georgia,serif;margin:0 0 5px}.voice-revision p{font-size:12px;line-height:1.6;color:#c9b6c7;margin:0 0 12px}.voice-compose{display:flex;align-items:start;gap:8px}.voice-compose textarea{flex:1;min-height:77px}.voice-chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}.voice-chips button{color:#f1d4e2;border:1px solid #775a76;border-radius:30px;background:#39283d;padding:8px 10px;font-size:11px}.voice-revision .action-row{margin-top:13px}.voice-revision #voice-status{margin-top:10px}.topbar .status{flex-shrink:0}
+body:not(.show-advanced) .vault-banner,body:not(.show-advanced) .buyer-chat-panel,body:not(.show-advanced) #persona-grid,body:not(.show-advanced) #persona-description,body:not(.show-advanced) #advanced-settings,body:not(.show-advanced) #custom-wrap,body:not(.show-advanced) #passcode-wrap,body:not(.show-advanced) .settings-heading,body:not(.show-advanced) #style-question,body:not(.show-advanced) #confirm-style,body:not(.show-advanced) #analyze,body:not(.show-advanced) #notes,body:not(.show-advanced) label[for="notes"],body:not(.show-advanced) #load-sample,body:not(.show-advanced) #reference-audit{display:none!important}
+body:not(.show-advanced) .hero{padding:23px 0 18px}body:not(.show-advanced) .hero h1{font-size:clamp(32px,5vw,48px);margin:10px 0}body:not(.show-advanced) .hero-pills{display:none}body:not(.show-advanced) .workspace{grid-template-columns:minmax(0,1fr);max-width:680px;margin:auto}body:not(.show-advanced) .results-panel{min-height:0}body:not(.show-advanced) .panel{padding:20px}body:not(.show-advanced) .dropzone{min-height:150px}body:not(.show-advanced) .identity-box .manual-select{display:none}body:not(.show-advanced) .identity-box{margin-top:12px}body:not(.show-advanced) #message{min-height:76px}body:not(.show-advanced) .panel .divider{display:none}body:not(.show-advanced) .fineprint{margin-top:6px}
+@media(max-width:570px){.nav-menu{font-size:12px;padding:8px;margin-right:5px}.topbar{height:72px}.topbar .status{padding:6px;font-size:9px}.brandname{font-size:23px}.voice-compose{flex-wrap:wrap}.voice-compose textarea{min-width:100%}.voice-compose #voice-mic{width:100%}}
 </style>
-  <title>Delilah Reply Assistant · V4 · Buyer Chats</title>
+  <title>Delilah Reply Assistant · V4.3 · Smart Flow</title>
 </head>
 <body>
   <div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
-  <section class="login-screen" id="login-screen" aria-labelledby="login-title">
-    <form class="login-card" id="login-form">
-      <div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah</span></div>
-      <h1 id="login-title">Welcome back.</h1><p>Sign in to your reply assistant.</p>
-      <label class="field-label" for="login-username">Username</label><input type="text" id="login-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
-      <label class="field-label" for="login-password">Password</label><input type="password" id="login-password" name="password" autocomplete="current-password" required>
-      <label class="checkbox-control" style="margin-top:18px"><input type="checkbox" id="remember-device" checked> Remember me on this device</label>
-      <p class="micro-copy">Stay signed in when you close and reopen the app. Sign out when using a shared device.</p>
-      <button class="generate" id="login-submit" type="submit">Sign in</button><p class="login-error" id="login-error" role="status">Checking sign-in…</p>
-    </form>
-  </section>
-  <div class="shell" id="app-shell" hidden>
-
-    <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT</span></span></div><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
-    <div class="account-bar"><span id="account-label"></span><button type="button" class="subtle-button" id="sign-out">Sign out</button></div>
+  <div class="shell">
+    <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT · V4.3</span></span></div><button class="subtle-button nav-menu" type="button" id="nav-menu" aria-expanded="false">☰ Menu</button><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
     <main>
-      <section class="hero hero-v3"><div class="eyebrow"><span class="eyebrow-line"></span> DELILAH'S VOICE · PRIVATE BY DESIGN</div><h1>Her voice. <em>Every reply.</em></h1><p>Upload a screenshot, review the buyer and style, then get <strong>two ready-to-send replies.</strong></p><div class="hero-pills"><span>♡ Flirty by default</span><span>♧ Saved buyer memory</span><span>✧ Review before sending</span></div></section>
+      <section class="hero hero-v3"><div class="eyebrow"><span class="eyebrow-line"></span> DELILAH'S VOICE · PRIVATE BY DESIGN</div><h1>Her voice. <em>Every reply.</em></h1><p>Add a screenshot. AI recognizes the buyer and writes <strong>two natural replies automatically</strong>. Copy one, or tell it what to change.</p><div class="hero-pills"><span>♡ Flirty by default</span><span>♧ Encrypted buyer memory</span><span>✧ Review before sending</span></div></section>
+      <section class="vault-banner" aria-labelledby="vault-heading">
+        <div class="vault-heading"><div><span class="step">PRIVATE MEMORY</span><h2 id="vault-heading">Buyers stay in their own lane.</h2><p id="vault-state">Unlock or create a private vault to remember buyers on this device.</p></div><span class="vault-symbol">♧</span></div>
+        <div id="vault-locked" class="vault-auth"><label class="field-label" for="vault-password">Private memory passphrase <span>never sent to the AI or server</span></label><div class="vault-auth-row"><input id="vault-password" type="password" autocomplete="off" placeholder="At least 10 characters"><button type="button" class="small-primary" id="vault-auth-button">Create private memory</button></div><p class="micro-copy" id="vault-auth-help">Use a unique passphrase; there is no recovery if it is lost. Without a vault you can still generate one-off replies.</p></div>
+        <div id="vault-unlocked" class="vault-content" hidden>
+          <div class="vault-toolbar"><label for="buyer-select" class="field-label">Saved buyers</label><select id="buyer-select"><option value="">Select a buyer…</option></select><button type="button" class="subtle-button" id="lock-vault">Lock memory</button></div>
+          <div class="vault-details"><label for="buyer-notes" class="field-label">Notes for this buyer <span>encrypted on this device</span></label><textarea id="buyer-notes" rows="2" maxlength="1000" placeholder="Past topics, preferences, agreed boundaries…" disabled></textarea><button type="button" class="subtle-button" id="save-buyer-notes" disabled>Save buyer notes</button>
+            <details class="playbook-details"><summary>Delilah's saved creator playbook</summary><label class="field-label" for="playbook">Optional factual guidance for all buyers</label><textarea id="playbook" rows="4" maxlength="2000"></textarea><button type="button" class="subtle-button" id="save-playbook">Save playbook</button></details>
+          </div>
+          <details class="privacy-details"><summary>My private references</summary><p class="micro-copy">Saved encrypted on this device. Enabled references may be sent to AI for your requested replies. Import your own TXT or Markdown files, or paste text. Maximum 20 references, 12,000 characters each. Enable up to four voice/offerings references. Their first 3,000/2,500 characters are supplied; guidance is searched for matching passages.</p><div id="private-reference-list"></div><label class="field-label" for="reference-title">Reference title</label><input id="reference-title" type="text" maxlength="100"><label class="field-label" for="reference-kind">Purpose</label><select id="reference-kind"><option value="voice">My voice samples</option><option value="guidance">Conversation guidance</option><option value="offerings">Offerings and boundaries</option></select><label class="field-label" for="reference-text">Reference text</label><textarea id="reference-text" maxlength="12000"></textarea><input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown"><div class="action-row"><button type="button" id="reference-save" class="small-primary">Save reference</button><button type="button" id="reference-new" class="subtle-button">New reference</button></div></details><details class="privacy-details"><summary>Privacy and backup controls</summary><div class="privacy-actions"><label class="checkbox-control"><input type="checkbox" id="include-history" checked> Include this buyer's saved messages in AI replies</label><label class="checkbox-control"><input type="checkbox" id="save-incoming" checked> Save this buyer's incoming chat text in encrypted memory</label><div class="action-row"><button type="button" id="export-vault" class="subtle-button">Export encrypted backup</button><label class="file-button">Import encrypted backup<input id="import-vault" type="file" accept=".json,application/json" hidden></label></div><div class="action-row"><button type="button" id="delete-buyer" class="danger-outline" disabled>Delete selected buyer</button><button type="button" id="erase-vault" class="danger-outline">Erase all buyer memory</button></div><p class="micro-copy">Conversation text, notes, buyer settings, and private references are encrypted here; screenshots are never saved. Data lives in this browser on this device. Clearing Safari website data removes it; export a backup first if needed.</p></div></details>
+        </div>
+      </section>
+
       <section class="buyer-chat-panel" id="buyer-chat-panel" aria-labelledby="chat-panel-heading">
         <div class="chat-panel-top"><div><span class="step">BUYER CONVERSATIONS</span><h2 id="chat-panel-heading">Private buyer chats</h2><p class="chat-explain">A separate conversation for each FeetFinder screen name, titled <b>Username FF</b>. Returning buyers reopen their existing chat.</p></div><span class="chat-header-icon">✧</span></div>
         <div class="chat-toolbar"><label class="field-label" for="chat-search">Find a buyer</label><input id="chat-search" type="search" placeholder="Search username or Username FF" autocomplete="off" aria-label="Search saved buyer chats"><div class="chat-count" id="chat-count">Unlock memory to browse chats</div></div>
         <div class="chat-list" id="chat-list" aria-live="polite"><p class="chat-empty">Unlock private memory above to see buyer conversations.</p></div>
-        <p class="chat-helper">New usernames automatically create a chat only when screenshot analysis is confident and memory is unlocked. Unclear usernames require confirmation. Screenshots aren't saved; saved buyer messages and notes stay on this device.</p>
-        <details id="saved-conversation" hidden><summary id="saved-conversation-title">Saved conversation</summary><p class="micro-copy">Chat text saves automatically for the confirmed buyer. Only replies you mark sent are recorded as sent.</p><div id="saved-conversation-entries"></div><button type="button" id="delete-open-buyer" class="danger-outline">Delete this buyer and conversation</button></details>
+        <p class="chat-helper">New usernames automatically create a chat only when screenshot analysis is confident and memory is unlocked. Unclear usernames require confirmation. Screenshots aren't saved; saved buyer messages and notes are encrypted on this device.</p>
       </section>
       <div class="workspace workspace-v3">
         <section class="panel compose-panel" aria-labelledby="compose-title">
           <div class="panel-top"><div><span class="step">01 / THE CHAT</span><h2 id="compose-title">What did they say?</h2></div><span class="panel-icon">✳</span></div>
-          <p class="section-helper">Choose a screenshot from Photos, paste the buyer's message, or both. When live AI is connected, screenshots are analyzed automatically to route the correct buyer. Confirm unclear usernames before using history.</p>
+          <p class="section-helper">Add a screenshot and AI does the rest. Only unclear buyer names need confirmation.</p>
           <div class="dropzone" id="dropzone"><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/*" aria-label="Upload a conversation screenshot"><div id="empty-upload" class="drop-inner"><div class="upload-icon">↥</div><strong>Add a chat screenshot</strong><span>Tap to choose from Photos, or drag and drop</span><small>PNG, JPG, WEBP · screenshot stays in this session</small></div><div class="upload-preview" id="upload-preview" hidden><img id="preview-image" alt="Selected buyer conversation screenshot"><div class="upload-info"><strong id="upload-filename"></strong><span>Ready to analyze</span></div><button type="button" class="remove-upload" id="remove-upload" aria-label="Remove screenshot">×</button></div></div>
-          <div class="action-row screenshot-actions"><button type="button" class="small-primary" id="analyze" disabled>✧ Analyze screenshot & username</button><button type="button" class="subtle-button" id="clear-chat">Clear chat</button></div>
+          <div class="action-row screenshot-actions"><button type="button" class="small-primary" id="analyze" disabled>✧ Analyze again</button><button type="button" class="subtle-button" id="clear-chat">Clear chat</button></div>
           <div id="chat-switch-alert" role="status" hidden></div><div class="identity-box" aria-live="polite"><div class="identity-top"><span class="identity-label">CURRENT BUYER</span><strong id="active-buyer">One-off · no history</strong></div><p id="identity-text">Add a screenshot or select an existing buyer. We won't guess when a name is cropped.</p><div id="identity-warning" class="identity-warning" hidden><strong id="identity-warning-title">Possible buyer switch</strong><p id="identity-warning-body"></p><div class="action-row"><button type="button" id="confirm-detected" class="small-primary" hidden>Confirm buyer</button><button type="button" id="confirm-current" class="subtle-button" hidden>Keep current buyer (I verified)</button><button type="button" id="use-oneoff" class="subtle-button">Use without buyer history</button></div></div>
             <div class="manual-select"><label class="field-label" for="manual-username">Or confirm a buyer username yourself</label><div class="manual-row"><input id="manual-username" type="text" maxlength="49" placeholder="Buyer username (not Delilah's)"><button type="button" id="use-manual" class="subtle-button">Use buyer</button></div></div>
           </div>
@@ -129,28 +129,24 @@
           <div class="two-fields"><div><label class="field-label" for="direction">Conversation direction</label><select id="direction"><option value="stay">Stay on topic</option><option value="change">Change topic</option><option value="revive">Revive conversation</option><option value="connection">Build connection</option><option value="flirt_up">Turn up flirting</option><option value="flirt_down">Dial back flirting</option><option value="content">Introduce paid content naturally</option><option value="boundaries">Set boundaries</option></select></div><div><label class="field-label" for="energy">Reply energy</label><select id="energy"><option value="match">Match buyer</option><option value="softer">Softer</option><option value="playful">More playful</option><option value="intense">More intense</option></select></div></div>
           <div class="two-fields"><div><label class="field-label" for="directness">Directness</label><select id="directness"><option value="direct">Get to the point</option><option value="balanced">Balanced</option><option value="anticipation">Build anticipation</option></select></div><div class="emoji-field"><label class="field-label">Emojis</label><label class="checkbox-control"><input type="checkbox" id="emoji"> Allow occasional emoji</label></div></div>
           </details><button type="button" id="confirm-style" class="small-primary" hidden>Confirm settings</button>
-
+          <div class="passcode-wrap" id="passcode-wrap" hidden><label class="field-label" for="passcode">Server access passcode</label><input type="password" id="passcode" autocomplete="off" placeholder="Enter the private server passcode"><small>Enter once to remember this browser for up to 30 days. The passcode itself is not saved in page storage.</small><button type="button" id="login-session" class="small-primary">Sign in &amp; remember this browser</button><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></div>
           <button type="button" class="generate" id="generate"><span id="generate-icon">✦</span><span id="generate-label">Generate 2 replies</span><span class="generate-arrow">↗</span></button>
           <p class="fineprint">A human reviews and sends all replies. Copied replies add <b>#AI</b> disclosure.</p>
         </section>
-        <section class="panel results-panel" aria-labelledby="results-title"><div class="panel-top"><div><span class="step">03 / READY TO SEND</span><h2 id="results-title">Two ways to say it.</h2></div><span class="panel-icon">✦</span></div><p class="section-helper">Both suggestions respond to the actual message in Delilah's natural voice. Copy one, edit it if needed, and send it yourself.</p><div class="notice" id="notice" role="status" aria-live="polite" hidden></div><div class="empty-results" id="empty-results"><div class="empty-orb"><span>♡</span></div><div class="empty-title">Replies with her personality.</div><p>Add a screenshot or paste a message, confirm the buyer, then tap Generate.</p><span class="empty-sparkles">✧ &nbsp; ✦ &nbsp; ✧</span></div><div class="context-note" id="context-wrap" hidden><b>Conversation read</b><span id="context-text"></span></div><div class="results" id="results" hidden></div><details id="reference-audit" class="privacy-details" hidden><summary>References supplied for these replies</summary><p class="micro-copy">Supplied means included in this request. AI-reported use is self-reported, not proof of influence.</p><div id="reference-sources"></div></details><div class="results-bottom" id="results-bottom" hidden><button type="button" class="regenerate" id="regenerate">↻ &nbsp; Two new versions</button><p>Copying does NOT mark a reply as sent. Use “Mark sent” only after you actually send it.</p></div>
-          <div class="privacy-note"><span class="lock-icon">♧</span><div><b>Private, not invisible</b><p>Only screenshots you upload are analyzed. Screenshots are kept in page memory, never in the encrypted vault. Buyer history is saved in this browser when Save buyer conversations is on. Live AI sends the message, optional selected buyer history and uploaded screenshot to OpenAI for processing. The server has no chat database. No automatic FeetFinder access or sending.</p><p>To reduce exposure, crop unrelated personal information before uploading. AI recognition can be wrong; confirm buyer identities.</p></div></div>
+        <section class="panel results-panel" aria-labelledby="results-title"><div class="panel-top"><div><span class="step">03 / READY TO SEND</span><h2 id="results-title">Two ways to say it.</h2></div><span class="panel-icon">✦</span></div><p class="section-helper">Both suggestions respond to the actual message in Delilah's natural voice. Copy one, edit it if needed, and send it yourself.</p><div class="notice" id="notice" role="status" aria-live="polite" hidden></div><div class="empty-results" id="empty-results"><div class="empty-orb"><span>♡</span></div><div class="empty-title">Replies with her personality.</div><p>Add a screenshot to generate two replies automatically. You can also paste a message.</p><span class="empty-sparkles">✧ &nbsp; ✦ &nbsp; ✧</span></div><div class="context-note" id="context-wrap" hidden><b>Conversation read</b><span id="context-text"></span></div><div class="results" id="results" hidden></div><details id="reference-audit" class="privacy-details" hidden><summary>References supplied for these replies</summary><p class="micro-copy">Supplied means included in this request. AI-reported use is self-reported, not proof of influence.</p><div id="reference-sources"></div></details><div class="results-bottom" id="results-bottom" hidden><button type="button" class="regenerate" id="regenerate">↻ &nbsp; Two new versions</button><p>Copy does not send a FeetFinder message. Mark sent only after you have actually sent it.</p></div>
+          <section class="voice-revision" id="voice-revision" hidden aria-label="Change reply style or dictate your own message">
+            <h3>Want to change the style?</h3>
+            <p>Tell AI naturally what to change, or dictate the message you want to send.</p>
+            <div class="voice-compose"><button type="button" id="voice-mic" class="small-primary" aria-label="Start dictation">🎙 Speak</button><textarea id="voice-command" rows="2" maxlength="1600" placeholder="e.g. I like reply 2, but make it a little naughtier and shorter…"></textarea></div>
+            <div class="voice-chips"><button type="button" data-revise="Make the two replies a little naughtier but natural.">Naughtier</button><button type="button" data-revise="Make the replies shorter and get straight to the point.">More direct</button><button type="button" data-revise="Make the replies sound more casual and authentic to Delilah.">More natural</button></div>
+            <div class="action-row"><button type="button" id="voice-apply" class="small-primary">✦ Update replies</button><button type="button" id="voice-undo" class="subtle-button" disabled>↶ Undo</button><button type="button" id="voice-style" class="subtle-button">More styles</button></div>
+            <p class="micro-copy" id="voice-status">Speech recognition depends on browser support and microphone permission. Typed instructions always work.</p>
+          </section>
+          <div class="privacy-note"><span class="lock-icon">♧</span><div><b>Private, not invisible</b><p>Only screenshots you upload are analyzed. Screenshots are kept in page memory, never in the encrypted vault. Buyer histories are encrypted in this browser if you turn on memory; an unlocked vault is required. Live AI sends the message, optional selected buyer history and uploaded screenshot to OpenAI for processing. The server has no chat database. No automatic FeetFinder access or sending.</p><p>To reduce exposure, crop unrelated personal information before uploading. AI recognition can be wrong; confirm buyer identities.</p></div></div>
         </section>
       </div>
-      <footer><span>DELILAH REPLY ASSISTANT · V4</span><span>iPhone: open the hosted HTTPS site in Safari → Share → Add to Home Screen.</span></footer>
-    <details id="app-settings" class="panel app-settings"><summary>Settings · memory, references and backups</summary>      <section class="vault-banner" aria-labelledby="vault-heading">
-        <div class="vault-heading"><div><span class="step">PRIVATE MEMORY</span><h2 id="vault-heading">Buyers stay in their own lane.</h2><p id="vault-state">Unlock or create a private vault to remember buyers on this device.</p></div><span class="vault-symbol">♧</span></div>
-        <button type="button" id="legacy-memory-backup" class="subtle-button" hidden>Download older encrypted memory backup</button><label class="checkbox-control"><input type="checkbox" id="memory-enabled" checked> Save buyer conversations</label><p class="micro-copy">On by default. Off pauses saving and hides saved chats without deleting them. Stored in this browser without a separate password.</p><div id="vault-locked" class="vault-auth" style="display:none"><label class="field-label" for="vault-password">Private memory passphrase <span>never sent to the AI or server</span></label><div class="vault-auth-row"><input id="vault-password" type="password" autocomplete="off" placeholder="At least 10 characters"><button type="button" class="small-primary" id="vault-auth-button">Create private memory</button></div><p class="micro-copy" id="vault-auth-help">Use a unique passphrase; there is no recovery if it is lost. Without a vault you can still generate one-off replies.</p><div id="locked-memory-controls" style="display:none" hidden><button type="button" class="subtle-button" id="backup-locked-memory">Download backup</button><button type="button" class="danger-outline" id="reset-locked-memory">Forgot passphrase? Reset private memory</button><p class="micro-copy">Reset deletes saved buyer chats, settings, notes and personal references from this browser on this device. Built-in references stay available. A backup still needs the original passphrase to unlock.</p></div></div>
-        <div id="vault-unlocked" class="vault-content" hidden>
-          <div class="vault-toolbar"><label for="buyer-select" class="field-label">Saved buyers</label><select id="buyer-select"><option value="">Select a buyer…</option></select><button type="button" class="subtle-button" id="lock-vault" hidden>Lock memory</button></div>
-          <div class="vault-details"><label for="buyer-notes" class="field-label">Notes for this buyer <span>encrypted on this device</span></label><textarea id="buyer-notes" rows="2" maxlength="1000" placeholder="Past topics, preferences, agreed boundaries…" disabled></textarea><button type="button" class="subtle-button" id="save-buyer-notes" disabled>Save buyer notes</button>
-            <details class="playbook-details"><summary>Delilah's saved creator playbook</summary><label class="field-label" for="playbook">Optional factual guidance for all buyers</label><textarea id="playbook" rows="4" maxlength="2000"></textarea><button type="button" class="subtle-button" id="save-playbook">Save playbook</button></details>
-          </div>
-          <details class="privacy-details"><summary>My private references</summary><p class="micro-copy">Saved encrypted on this device. Enabled references may be sent to AI for your requested replies. Import your own TXT or Markdown files, or paste text. Maximum 20 references, 12,000 characters each. Enable up to four voice/offerings references. Their first 3,000/2,500 characters are supplied; guidance is searched for matching passages.</p><div id="private-reference-list"></div><label class="field-label" for="reference-title">Reference title</label><input id="reference-title" type="text" maxlength="100"><label class="field-label" for="reference-kind">Purpose</label><select id="reference-kind"><option value="voice">My voice samples</option><option value="guidance">Conversation guidance</option><option value="offerings">Offerings and boundaries</option></select><label class="field-label" for="reference-text">Reference text</label><textarea id="reference-text" maxlength="12000"></textarea><input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown"><div class="action-row"><button type="button" id="reference-save" class="small-primary">Save reference</button><button type="button" id="reference-new" class="subtle-button">New reference</button></div></details><details class="privacy-details"><summary>Privacy and backup controls</summary><div class="privacy-actions"><label class="checkbox-control"><input type="checkbox" id="include-history" checked> Include this buyer's saved messages in AI replies</label><label class="checkbox-control"><input type="checkbox" id="save-incoming" checked> Save this buyer's incoming chat text in encrypted memory</label><div class="action-row"><button type="button" id="export-vault" class="subtle-button">Export backup</button><label class="file-button">Import backup<input id="import-vault" type="file" accept=".json,application/json" hidden></label></div><div class="action-row"><button type="button" id="delete-buyer" class="danger-outline" disabled>Delete selected buyer</button><button type="button" id="erase-vault" class="danger-outline">Erase all buyer memory</button></div><p class="micro-copy">Conversation text, notes, buyer settings, and personal references are saved in this browser without a separate password; screenshots are never saved. Data lives in this browser on this device. Clearing Safari website data removes it; export a backup first if needed.</p></div></details>
-        </div>
-      </section>
-
-          <div id="passcode-wrap" hidden><input id="passcode" type="password" autocomplete="off" hidden></div><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></details></main>
+      <footer><span>DELILAH REPLY ASSISTANT · V4.3</span><span>iPhone: open the hosted HTTPS site in Safari → Share → Add to Home Screen.</span></footer>
+    </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script>window.DELILAH_DEMO_ONLY=false;
@@ -259,7 +255,7 @@ class EncryptedVault {
   constructor(storage) {let target=storage; if(!target){try{target=window.localStorage;}catch{target=null;}}this.storage=target||{getItem:()=>null,setItem:()=>{throw new Error('Browser storage is unavailable. Use the hosted HTTPS app.');},removeItem:()=>{}};this.key=null;this.salt=null;this.data=null;this.queue=Promise.resolve();}
   get exists(){return Boolean(this.storage.getItem(STORAGE_KEY));}
   get unlocked(){return Boolean(this.key&&this.data);}
-  list(){return this.unlocked?this.data.buyers.map(b=>({username:b.username,displayName:b.displayName||b.username,personality:b.settings?.personality||'flirty',smartSelect:b.settings?.smartSelect!==false,count:b.events.length,incoming:b.events.filter(e=>e.kind==='incoming').length,sent:b.events.filter(e=>e.kind==='sent').length,lastActivity:b.events.reduce((latest,e)=>Math.max(latest,Number(e.time)||0),0),updated:b.updated})).sort((a,b)=>b.updated-a.updated):[];}
+  list(){return this.unlocked?this.data.buyers.map(b=>({username:b.username,displayName:b.displayName||b.username,count:b.events.length,updated:b.updated})).sort((a,b)=>b.updated-a.updated):[];}
   getBuyer(username){const key=safeHandle(username);if(!this.unlocked||!key)return null;const b=this.data.buyers.find(x=>x.username===key);return b?structuredClone(b):null;}
   getReferences(){return this.unlocked?structuredClone(this.data.references||[]):[];}
   async setReferences(refs){if(!Array.isArray(refs)||refs.length>20)throw Error('Maximum 20 private references.');if(refs.filter(r=>r.enabled&&['voice','offerings'].includes(r.kind)).length>4)throw Error('Enable up to four voice/offerings references. Use guidance for additional documents.');await this.update(d=>{d.references=refs;});}
@@ -284,19 +280,6 @@ class EncryptedVault {
       this.key=key;this.salt=salt;this.data=data;
     }catch{this.lock();throw new Error('Could not unlock. Check your passphrase or backup.');}
   }
-  async changePassphrase(passphrase){
-    if(!this.unlocked)throw Error('Unlock existing memory first.');
-    const previousKey=this.key,previousSalt=this.salt;
-    const salt=crypto.getRandomValues(new Uint8Array(16)),key=await this.derive(passphrase,salt);
-    this.key=key;this.salt=salt;try{await this.save();}catch(error){this.key=previousKey;this.salt=previousSalt;throw error;}
-  }
-  async resume(key,salt){
-    const saved=this.parseStored();if(!saved||saved.salt!==salt)throw Error('Saved unlock does not match this memory.');
-    try{const plaintext=await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(saved.iv)},key,base64ToBytes(saved.ciphertext));
-      const data=JSON.parse(decoder.decode(plaintext));if(data.version!==1||!Array.isArray(data.buyers)||typeof data.playbook!=='string')throw Error('Invalid memory');
-      this.key=key;this.salt=base64ToBytes(salt);this.data=data;
-    }catch{this.lock();throw Error('Sign in again to unlock private memory.');}
-  }
   lock(){this.key=null;this.salt=null;this.data=null;}
   parseStored(){try{const blob=JSON.parse(this.storage.getItem(STORAGE_KEY)||'null');return blob&&blob.version===1&&blob.salt&&blob.iv&&blob.ciphertext?blob:null;}catch{return null;}}
   async save(){
@@ -318,6 +301,13 @@ class EncryptedVault {
     await this.update(d=>{if(!d.buyers.some(b=>b.username===key))d.buyers.push({username:key,displayName:displayName||key,notes:'',events:[],updated:Date.now()});});
     return true;
   }
+  async addProfileObservation(username,observation){
+    const key=safeHandle(username),value=String(observation||'').trim().slice(0,500);if(!key||!value)return;
+    await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)return;
+      b.profileObservations=Array.isArray(b.profileObservations)?b.profileObservations:[];
+      if(!b.profileObservations.some(x=>x.text===value))b.profileObservations.push({text:value,time:Date.now()});
+      b.profileObservations=b.profileObservations.slice(-15);b.updated=Date.now();});
+  }
   async addIncoming(username,content,source='chat'){
     const key=safeHandle(username); const text=String(content||'').trim().slice(0,3600);
     if(!key||!text)return;
@@ -335,7 +325,6 @@ class EncryptedVault {
   }
   async setBuyerNotes(username,notes){const key=safeHandle(username);await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');b.notes=String(notes||'').slice(0,1000);b.updated=Date.now();});}
   async setPlaybook(value){await this.update(d=>{d.playbook=String(value||'').slice(0,2000);});}
-  async removeEvent(username,index){await this.update(d=>{const b=d.buyers.find(x=>x.username===safeHandle(username));if(!b||!Number.isInteger(index)||index<0||index>=b.events.length)throw Error('Saved entry not found.');b.events.splice(index,1);});}
   async removeBuyer(username){const key=safeHandle(username);await this.update(d=>{d.buyers=d.buyers.filter(b=>b.username!==key);});}
   async eraseAll(){this.lock();this.storage.removeItem(STORAGE_KEY);}
   exportEncrypted(){if(!this.exists)throw new Error('No encrypted memory to export.');return this.storage.getItem(STORAGE_KEY);}
@@ -346,32 +335,11 @@ class EncryptedVault {
   }
 }
 
-class DeviceMemory extends EncryptedVault {
- constructor(storage){super(storage);this.deviceKey='delilah-buyer-memory-device-v1';this.enabled=this.storage.getItem('delilah-memory-enabled')!=='off';this.data=this.readDevice();this.key=this.enabled?{}:null;}
- readDevice(){try{const d=JSON.parse(this.storage.getItem(this.deviceKey)||'null');if(d?.version===1&&Array.isArray(d.buyers)&&typeof d.playbook==='string')return d;}catch{}return makeEmpty();}
- get exists(){return Boolean(this.storage.getItem(this.deviceKey));}
- get unlocked(){return this.enabled&&Boolean(this.data);}
- async create(){return this.unlock();}
- async unlock(){this.enabled=true;this.storage.setItem('delilah-memory-enabled','on');this.data=this.readDevice();this.key={};}
- lock(){this.enabled=false;this.key=null;this.storage.setItem('delilah-memory-enabled','off');}
- async save(){if(!this.unlocked)throw Error('Turn on Save buyer conversations first.');this.storage.setItem(this.deviceKey,JSON.stringify(this.data));}
- async eraseAll(){this.storage.removeItem(this.deviceKey);this.data=makeEmpty();}
- exportEncrypted(){return JSON.stringify({format:'delilah-device-backup-v1',data:this.data});}
- async importEncrypted(serialized){const parsed=JSON.parse(serialized);if(parsed.format!=='delilah-device-backup-v1'||parsed.data?.version!==1||!Array.isArray(parsed.data.buyers)||typeof parsed.data.playbook!=='string')throw Error('Use a device-memory backup. Older encrypted backups remain protected by their original password.');this.data=parsed.data;this.enabled=true;this.key={};this.storage.setItem('delilah-memory-enabled','on');await this.save();}
-}
-async function deviceUnlockStore(action,value){
- if(!globalThis.indexedDB){if(action==='put')throw Error('Remembered memory is unavailable in this browser.');return null;}
- const db=await new Promise((resolve,reject)=>{const req=indexedDB.open('delilah-device-unlock',1);req.onupgradeneeded=()=>req.result.createObjectStore('keys');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(Error('Could not open device storage.'));});
- try{return await new Promise((resolve,reject)=>{const tx=db.transaction('keys',action==='get'?'readonly':'readwrite'),store=tx.objectStore('keys');let result=null;
- const req=action==='get'?store.get('current'):action==='put'?store.put(value,'current'):store.delete('current');
- req.onsuccess=()=>{result=req.result;};tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(Error('Could not save device sign-in.'));tx.onabort=()=>reject(Error('Device sign-in was not saved.'));});}finally{db.close();}
-}
-
 
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
-const vault=new DeviceMemory();
+const vault=new EncryptedVault();
 const descriptions={
   sweet:'Thoughtful, feminine and kind without overdoing compliments.',
   flirty:'Smart, feminine, lightly teasing and believable—not rehearsed.',
@@ -380,13 +348,13 @@ const descriptions={
   natural:'Observant, quick-witted, relaxed and genuinely conversational.',
   spicy:'Bold banter with natural strong language; non-graphic.',playful:'Light, witty teasing.'
 };
-const state={styleConfirmed:false,...DEFAULTS,aiReady:false,passcodeRequired:false,image:'',imageUrl:'',analysis:null,activeBuyer:null,
+const state={styleConfirmed:true,revisionInstruction:'',previousGenerated:null,...DEFAULTS,aiReady:false,passcodeRequired:false,image:'',imageUrl:'',analysis:null,activeBuyer:null,
   oneoff:true,identityPending:false,pendingBuyer:null,pendingDisplay:null,identityOverride:false,loading:false,generated:null,generationBuyer:null,demoCount:0,requestVersion:0};
 let toastTimer;
 function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2500);}
 function notice(message,error=false){const element=$('notice');element.hidden=!message;element.textContent=message||'';element.className='notice'+(error?' error':'');}
 function values(){return {...cleanSettings({...state,length:$('length').value,objective:$('objective').value,direction:$('direction').value,energy:$('energy').value,directness:$('directness').value,emoji:$('emoji').checked,smartSelect:$('smart-select').checked,profanity:$('profanity').value}),customStyle:$('custom-style').value.trim()};}
-function savePrefs(){const p=values();try{localStorage.setItem('delilah-v3-prefs',JSON.stringify(p));}catch{}if(vault.unlocked&&state.activeBuyer&&!state.oneoff&&!state.identityPending){vault.setBuyerSettings(state.activeBuyer,p).then(renderBuyerChats).catch(e=>notice(e.message,true));}}
+function savePrefs(){const p=values();try{localStorage.setItem('delilah-v3-prefs',JSON.stringify(p));}catch{}}
 function choose(group,value){if(!VALID[group]||!VALID[group].includes(value))return;state[group]=value;document.querySelectorAll(`[data-group="${group}"]`).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.value===value)));
   if(group==='personality'){$('persona-description').textContent=descriptions[value];}savePrefs();}
 function loadPrefs(){let pref={};try{pref=JSON.parse(localStorage.getItem('delilah-v3-prefs')||'{}');}catch{}
@@ -398,7 +366,7 @@ function applySettings(input){const p=cleanSettings(input);state.smartSelect=p.s
  for(const id of ['length','objective','direction','energy','directness','profanity'])$(id).value=p[id];
  $('emoji').checked=p.emoji;$('smart-select').checked=p.smartSelect;$('custom-style').value=input?.customStyle||'';$('persona-description').textContent=descriptions[p.personality];
 }
-function resetStyleChoice(){state.settingsAtUpload=values();state.styleConfirmed=false;$('style-question').hidden=!state.image;$('style-status').textContent='Choose Yes or No before generating.';$('confirm-style').hidden=true;}
+function resetStyleChoice(){state.settingsAtUpload=values();state.styleConfirmed=true;$('style-question').hidden=true;$('confirm-style').hidden=true;}
 function busy(which,on){state.loading=on;for(const id of ['analyze','generate','regenerate'])$(id).disabled=on || (id==='analyze'&&!state.image);
   $('generate-label').textContent=on?(which==='analyze'?'Analyzing screenshot…':'Writing two replies…'):(state.aiReady?'Generate 2 AI replies':'Try 2 demo replies');$('generate-icon').textContent=on?'◌':'✦';
   $('analyze').textContent=on&&which==='analyze'?'Reading screenshot…':'✧ Analyze screenshot & username';}
@@ -409,17 +377,16 @@ function activeLabel(){return state.activeBuyer&&!state.oneoff?chatTitle(state.a
 function showSwitchAlert(message){const el=$('chat-switch-alert');el.textContent=message||'';el.hidden=!message;}
 function renderBuyerChats(){
   const list=$('chat-list'),term=$('chat-search').value.trim().toLowerCase();list.replaceChildren();
-  if(!vault.unlocked){const p=document.createElement('p');p.className='chat-empty';p.textContent='Turn on Save buyer conversations in Settings to see saved buyers.';list.append(p);$('chat-count').textContent='Saving off';return;}
+  if(!vault.unlocked){const p=document.createElement('p');p.className='chat-empty';p.textContent='Unlock private memory above to browse buyer conversations.';list.append(p);$('chat-count').textContent='Memory locked';return;}
   const all=vault.list(),matches=all.filter(b=>`${b.displayName} FF`.toLowerCase().includes(term));
-  const today=new Date();today.setHours(0,0,0,0);const active=all.filter(b=>b.lastActivity>=today.getTime()).length;
-  $('chat-count').textContent=(term?`${matches.length} matching · `:'')+`${all.length} buyer${all.length===1?'':'s'} · ${active} active today`;
+  $('chat-count').textContent=`${matches.length} of ${all.length} buyer chat${all.length===1?'':'s'}`;
   if(!matches.length){const p=document.createElement('p');p.className='chat-empty';p.textContent=term?'No matching buyer chats yet.':'No buyer chats yet. A confirmed new username creates the first one.';list.append(p);return;}
   for(const b of matches){
     const button=document.createElement('button');button.type='button';button.className='chat-item';button.dataset.buyer=b.username;button.setAttribute('aria-current',String(!state.oneoff&&state.activeBuyer===b.username));
     const avatar=document.createElement('span');avatar.className='chat-avatar';avatar.textContent=(b.displayName||'?').slice(0,1).toUpperCase();
     const details=document.createElement('span');details.className='chat-details';
     const title=document.createElement('span');title.className='chat-title';title.textContent=`${b.displayName} FF`;
-    const meta=document.createElement('span');meta.className='chat-meta';meta.textContent=`${b.personality}${b.smartSelect?' + Smart Select':''} · ${b.incoming} saved chat entries · ${b.sent} replies marked sent · ${b.lastActivity?'Last activity '+new Date(b.lastActivity).toLocaleDateString():'No messages yet'}`;meta.title='Counts cover saved entries in this app. A screenshot excerpt may contain several messages. Replies count only when marked sent. Recent history keeps up to 80 entries per buyer.';
+    const meta=document.createElement('span');meta.className='chat-meta';meta.textContent=`${b.count} saved message${b.count===1?'':'s'}`;
     details.append(title,meta);button.append(avatar,details);button.addEventListener('click',()=>openSavedBuyer(b.displayName));list.append(button);
   }
 }
@@ -448,13 +415,11 @@ function refreshIdentity(){
 }
 function refreshVault(){
   renderPrivateReferences();
-  const has=vault.exists,unlocked=vault.unlocked;$('legacy-memory-backup').hidden=!localStorage.getItem(STORAGE_KEY);
-  $('locked-memory-controls').hidden=!has||unlocked;
+  const has=vault.exists,unlocked=vault.unlocked;
   $('vault-locked').hidden=unlocked;$('vault-unlocked').hidden=!unlocked;
-  $('memory-enabled').checked=vault.enabled;
   $('vault-auth-button').textContent=has?'Unlock private memory':'Create private memory';
-  $('vault-auth-help').textContent=state.authenticated?(pendingMemoryPassword?'Enter the OLD private-memory passphrase once to preserve and connect your saved chats.':'Your login password unlocks private memory. Remember me also remembers the unlock on this device.'):has?'Enter your passphrase to unlock. It is never uploaded or stored. If you lose it, stored histories cannot be recovered.':'Use at least 10 characters. Your passphrase cannot be recovered, so keep it somewhere safe.';
-  $('vault-state').textContent=unlocked?`Saving on · ${vault.list().length} buyer profile(s) on this device.`:'Saving off. Existing conversations are kept on this device.';
+  $('vault-auth-help').textContent=has?'Enter your passphrase to unlock. It is never uploaded or stored. If you lose it, stored histories cannot be recovered.':'Use at least 10 characters. Your passphrase cannot be recovered, so keep it somewhere safe.';
+  $('vault-state').textContent=unlocked?`Encrypted memory unlocked on this device · ${vault.list().length} buyer profile(s).`:has?'Memory locked. You can use one-off replies without unlocking.':'Create encrypted memory to preserve separate buyer histories, or use one-off mode.';
   const select=$('buyer-select'),chosen=state.activeBuyer;
   select.replaceChildren();const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Choose a saved buyer…';select.append(placeholder);
   if(unlocked){
@@ -464,18 +429,7 @@ function refreshVault(){
   }
   const buyer=unlocked&&!state.oneoff? vault.getBuyer(chosen):null;
   $('buyer-notes').value=buyer?.notes||'';
-  refreshIdentity();renderBuyerChats();renderSavedConversation();
-}
-function renderSavedConversation(){
- const buyer=vault.unlocked&&state.activeBuyer&&!state.oneoff?vault.getBuyer(state.activeBuyer):null;
- $('saved-conversation').hidden=!buyer;const list=$('saved-conversation-entries');list.replaceChildren();if(!buyer)return;
- $('saved-conversation-title').textContent=buyer.displayName+' FF · saved conversation';
- buyer.events.forEach((event,index)=>{const row=document.createElement('div');row.className='result-card';const title=document.createElement('b');title.textContent=(event.kind==='sent'?'Delilah · marked sent':'Buyer · saved chat')+' · '+new Date(event.time).toLocaleString();const text=document.createElement('p');text.style.whiteSpace='pre-wrap';text.textContent=event.content;const button=document.createElement('button');button.type='button';button.className='danger-outline';button.textContent='Delete this entry';button.onclick=async()=>{if(!confirm('Delete this saved entry? This cannot be undone without a backup.'))return;try{await vault.removeEvent(buyer.username,index);clearResults();refreshVault();}catch(e){notice(e.message,true);}};row.append(title,text,button);list.append(row);});
-}
-async function autosaveBuyerMessage(){
- if(!vault.unlocked||!state.activeBuyer||state.oneoff||state.identityPending||!$('save-incoming').checked)return;
- const text=state.analysis?.conversation_excerpt||$('message').value.trim();if(!text)return;
- try{await vault.addIncoming(state.activeBuyer,text,state.analysis?'screenshot':'chat');renderBuyerChats();renderSavedConversation();}catch(e){notice(e.message,true);}
+  refreshIdentity();renderBuyerChats();
 }
 function openSavedBuyer(username){
   const to=normalizeUsername(username),visible=normalizeUsername(state.analysis?.buyer_username);
@@ -491,9 +445,9 @@ async function activateBuyer(username,byManual=false){
     const previous=state.activeBuyer&&!state.oneoff?state.activeBuyer:null;state.requestVersion++;
     const existing=vault.unlocked&&Boolean(vault.getBuyer(key));
     const saved=vault.unlocked?vault.getBuyer(key)?.settings:null;applySettings(saved||DEFAULTS);if(state.image)resetStyleChoice();
-    if(vault.unlocked){await vault.ensureBuyer(username);if(!saved)await vault.setBuyerSettings(username,values());}
+    if(vault.unlocked)await vault.ensureBuyer(username);
     state.activeBuyer=key;state.oneoff=false;state.pendingBuyer=null;state.pendingDisplay=null;state.identityPending=false;state.identityOverride=byManual||Boolean(state.analysis&&(state.analysis.identity_status!=='clear'||state.analysis.confidence!=='high'));
-    if(byManual||(state.analysis&&normalizeUsername(state.analysis.buyer_username)===key))await autosaveBuyerMessage();clearResults();refreshVault();$('manual-username').value='';
+    clearResults();refreshVault();$('manual-username').value='';
     if(previous&&previous!==key)showSwitchAlert(`Buyer changed: ${buyerName(previous)} FF → ${chatTitle(key)}. Separate buyer history ${existing?'reopened':'created'}.`);
     else showSwitchAlert(existing?`Opened ${chatTitle(key)} — existing buyer conversation.`:`${chatTitle(key)} — ${vault.unlocked?'new encrypted buyer chat created':'selected; unlock memory to save this buyer chat'}.`);
     toast(`${chatTitle(key)} · ${existing?'returning buyer':'new buyer'}`);
@@ -501,7 +455,7 @@ async function activateBuyer(username,byManual=false){
   }catch(e){notice(e.message,true);return null;}
 }
 function useOneoff(){state.requestVersion++;state.activeBuyer=null;state.oneoff=true;state.identityPending=false;state.pendingBuyer=null;state.pendingDisplay=null;state.identityOverride=false;clearResults();refreshVault();showSwitchAlert('One-off: no buyer history will be read or saved.');toast('One-off mode · no buyer memory');}
-function resetScreenshot(){$('style-question').hidden=true;state.styleConfirmed=false;state.requestVersion++;if(state.imageUrl)URL.revokeObjectURL(state.imageUrl);state.image='';state.imageUrl='';state.analysis=null;state.pendingBuyer=null;state.pendingDisplay=null;state.identityPending=false;
+function resetScreenshot(){$('style-question').hidden=true;state.styleConfirmed=true;state.revisionInstruction='';state.requestVersion++;if(state.imageUrl)URL.revokeObjectURL(state.imageUrl);state.image='';state.imageUrl='';state.analysis=null;state.pendingBuyer=null;state.pendingDisplay=null;state.identityPending=false;
   $('image-input').value='';$('preview-image').removeAttribute('src');$('upload-preview').hidden=true;$('empty-upload').hidden=false;$('screenshot-summary').textContent='No screenshot has been analyzed.';busy('',false);refreshIdentity();}
 async function readImage(file){
   if(!file||!file.type.startsWith('image/'))throw Error('Choose an image screenshot.');
@@ -524,7 +478,7 @@ async function readImage(file){
 }
 async function useFile(file){if(!file)return;try{
     const data=await readImage(file),url=URL.createObjectURL(file);
-    resetScreenshot();state.requestVersion++;state.image=data;state.imageUrl=url;state.identityPending=true;resetStyleChoice();
+    resetScreenshot();state.previousGenerated=null;$('voice-revision').hidden=true;state.requestVersion++;state.image=data;state.imageUrl=url;state.identityPending=true;resetStyleChoice();
     // A new screenshot is a new message. Never carry another buyer's text across uploads.
     $('message').value='';$('notes').value='';showSwitchAlert('');
     $('preview-image').src=url;$('upload-filename').textContent=(file.name||'Screenshot').slice(0,70);$('upload-preview').hidden=false;$('empty-upload').hidden=true;$('screenshot-summary').textContent='Screenshot selected. Buyer detection will start if live AI is connected.';
@@ -533,40 +487,16 @@ async function useFile(file){if(!file)return;try{
     clearResults();refreshIdentity();busy('',false);
     if(state.aiReady)await analyze();
   }catch(e){notice(e.message,true);}}
-let pendingMemoryPassword=null;
-async function rememberMemory(){return;/* Legacy key storage disabled for device memory. */
- if(!vault.unlocked)return;
- if(!state.rememberUntil){await deviceUnlockStore('delete');return;}
- await deviceUnlockStore('put',{key:vault.key,salt:bytesToBase64(vault.salt),expires:state.rememberUntil,accountVersion:state.accountVersion});
-}
-async function connectMemory(password){pendingMemoryPassword=null;if(!vault.exists&&localStorage.getItem(STORAGE_KEY)){try{const old=new EncryptedVault();await old.unlock(password);vault.data=structuredClone(old.data);if(vault.enabled)await vault.save();}catch{}}if(vault.enabled)await vault.unlock();refreshVault();}
-async function signIn(){
- const password=$('login-password').value;
- const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$('login-username').value,password,remember:$('remember-device').checked}),cache:'no-store'});
- const data=await res.json();if(!res.ok)throw Error(data.error||'Sign in failed.');
- state.authenticated=true;state.accountVersion=data.accountVersion;state.accountUsername=data.username;state.rememberUntil=data.rememberUntil;
- $('login-password').value='';await deviceUnlockStore('delete').catch(()=>{});
- await connectMemory(password);updateAuth();
- if(pendingMemoryPassword){$('app-settings').open=true;}
- if(pendingMemoryPassword)notice('Signed in. To keep your existing saved chats, enter their previous private-memory passphrase once. Future sign-ins will use your login password.',true);
-}
-function updateAuth(){
- const demo=Boolean(window.DELILAH_DEMO_ONLY);
- $('login-screen').hidden=Boolean(state.authenticated)||demo;
- $('app-shell').hidden=!state.authenticated&&!demo;
- $('account-label').textContent=state.authenticated?'Signed in as '+(state.accountUsername||'Delilah'):'';
- $('passcode-wrap').hidden=true;
-}
 async function requestJson(route,body){
-  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});
+  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify(body),cache:'no-store'});
   let data;try{data=await res.json();}catch{throw Error('The server returned an unreadable response.');}
-  if(!res.ok){if(res.status===401){state.authenticated=false;vault.lock();await deviceUnlockStore('delete').catch(()=>{});refreshVault();updateAuth();$('login-error').textContent='Please sign in again.';}throw Error(data.error||'The request failed.');}return data;
+  if(!res.ok)throw Error(data.error||'The request failed.');return data;
 }
 async function analyze(){
   if(state.loading||!state.image)return;
   if(!state.aiReady){notice('Screenshot analysis requires live AI. Paste the buyer’s message and manually select their chat for demo mode.',true);return;}
   const analyzedImage=state.image,version=state.requestVersion;
-  busy('analyze',true);
+  busy('analyze',true);let shouldAutoGenerate=false;
   try{
     const result=await requestJson('/api/analyze',{image:analyzedImage});
     if(version!==state.requestVersion||analyzedImage!==state.image)return;
@@ -600,8 +530,10 @@ async function analyze(){
     }
     if(result.age_concern)notice('Possible age or consent concern detected. Replies must stay non-flirtatious and establish appropriate boundaries.',true);
     clearResults();refreshIdentity();
+    shouldAutoGenerate=!state.identityPending&&Boolean($('message').value.trim());
   }catch(e){if(version===state.requestVersion)notice(e.message||'Could not analyze screenshot.',true);}
   finally{busy('',false);}
+  if(shouldAutoGenerate&&analyzedImage===state.image)await generate();
 }
 function demoReplies(message){
   state.demoCount++;
@@ -617,7 +549,7 @@ function renderReplies(data,isDemo=false){
   if(!data||!Array.isArray(data.suggestions)||data.suggestions.length!==2)throw Error('Expected two reply options.');
   renderReferenceAudit(data.referenceAudit,isDemo);
   if(data.selectedStyle)data.context=(data.context||'')+' · Manual: '+state.personality+' · Reply tone: '+data.selectedStyle;
-  state.generated=data;state.generationBuyer=state.oneoff?null:state.activeBuyer;
+  state.generated=data;$('voice-revision').hidden=false;$('voice-undo').disabled=!state.previousGenerated;state.generationBuyer=state.oneoff?null:state.activeBuyer;
   $('empty-results').hidden=true;$('results').hidden=false;$('results-bottom').hidden=false;
   $('context-wrap').hidden=!data.context;$('context-text').textContent=data.context||'';
   const container=$('results');container.replaceChildren();
@@ -627,7 +559,7 @@ function renderReplies(data,isDemo=false){
     const reply=document.createElement('p');reply.className='result-reply';reply.textContent=option.reply;
     const foot=document.createElement('div');foot.className='result-footer';const reason=document.createElement('span');reason.className='result-why';reason.textContent=option.why||'';
     const actions=document.createElement('div');actions.className='result-actions';
-    const copy=document.createElement('button');copy.type='button';copy.className='copy-btn';copy.textContent='Copy + #AI ↗';copy.addEventListener('click',()=>copyText(option.reply));
+    const copy=document.createElement('button');copy.type='button';copy.className='copy-btn';copy.textContent='Copy ↗';copy.addEventListener('click',()=>copyText(option.reply));
     const sent=document.createElement('button');sent.type='button';sent.className='sent-btn';sent.textContent='Mark sent';
     sent.disabled=isDemo||!vault.unlocked||!state.generationBuyer;
     sent.title=sent.disabled?'Requires live AI and unlocked selected-buyer memory':'Only tap after you have actually sent this message';
@@ -660,7 +592,7 @@ async function copyText(text){const output=disclosureText(text);try{
   }catch{notice('Copy was blocked. Select the reply and copy it manually, including #AI.',true);}}
 async function generate(){
   if(state.loading)return;
-  if(state.image&&!state.styleConfirmed)return notice('Choose Yes or No for this screenshot, then confirm any style changes.',true);
+  
   if(state.identityPending)return notice('Confirm this screenshot’s buyer or choose “Use without buyer history” first.',true);
   if(state.analysis?.buyer_username && !state.oneoff && state.activeBuyer!==normalizeUsername(state.analysis.buyer_username) && !state.identityOverride)return notice('This screenshot belongs to a different buyer. Choose the detected chat or explicitly verify the correct username.',true);
   const msg=$('message').value.trim(),excerpt=state.analysis?.conversation_excerpt||'';
@@ -678,31 +610,32 @@ async function generate(){
       result=await requestJson('/api/generate',{
         ...settings,message:msg,excerpt,notes:$('notes').value.trim(),
         buyerUsername:owner,buyerNotes:buyer?.notes||'',playbook:vault.unlocked?vault.getPlaybook():'',
-        history:buyer&&$('include-history').checked?trimmedHistory(buyer.events):[],
+        history:buyer&&$('include-history').checked?trimmedHistory(buyer.events):[],buyerProfile:buyer?.profileObservations?.map(x=>x.text).slice(-10)||[],
         ageConcern:state.analysis?.age_concern===true,analysisBuyer:state.analysis?.buyer_username||null,
-        identityOverride:state.identityOverride,screenshotRequest:Boolean(state.image),styleConfirmed:state.styleConfirmed,privateReferences:vault.unlocked?vault.getReferences().filter(r=>r.enabled):[]
+        identityOverride:state.identityOverride,screenshotRequest:Boolean(state.image),styleConfirmed:true,revisionInstruction:state.revisionInstruction||'',previousSuggestions:state.revisionInstruction?state.generated?.suggestions?.map(s=>s.reply)||[]:[],privateReferences:vault.unlocked?vault.getReferences().filter(r=>r.enabled):[]
       });
     } else result=demoReplies(msg);
     if(version!==state.requestVersion||owner!==(state.oneoff?null:state.activeBuyer))return;
     if(!isDemo&&vault.unlocked&&owner&&$('save-incoming').checked){
       const record=excerpt?`Screenshot conversation excerpt:\n${excerpt}`:msg;
-      await vault.addIncoming(owner,record,excerpt?'screenshot':'chat');refreshVault();
+      await vault.addIncoming(owner,record,excerpt?'screenshot':'chat');
+      if(excerpt&&state.analysis?.summary)await vault.addProfileObservation(owner,state.analysis.summary);
+      refreshVault();
     }
-    renderReplies(result,isDemo);
+    renderReplies(result,isDemo);state.revisionInstruction='';
   }catch(e){notice(e.message||'Could not generate replies.',true);}finally{busy('generate',false);}
 }
 function download(name,text){const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(pendingMemoryPassword){await vault.changePassphrase(pendingMemoryPassword);pendingMemoryPassword=null;}await rememberMemory();if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
+async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
 async function status(){
   if(window.DELILAH_DEMO_ONLY){state.aiReady=false;updateStatus();return;}
-  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);state.authenticated=Boolean(d.authenticated);state.accountVersion=d.accountVersion;state.accountUsername=d.username;state.rememberUntil=d.rememberUntil||null;
- if(state.authenticated){if(vault.enabled)await vault.unlock();refreshVault();}else await deviceUnlockStore('delete').catch(()=>{});$('login-error').textContent='';if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
-  catch{state.aiReady=false;state.passcodeRequired=false;$('login-error').textContent='Unable to reach the app. Please try again shortly.';}
+  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
+  catch{state.aiReady=false;state.passcodeRequired=false;}
   updateStatus();
 }
 function updateStatus(){
   $('status-text').textContent=state.aiReady?'Live AI ready':'Demo only';$('connection-status').classList.toggle('ai',state.aiReady);
-  updateAuth();
+  $('passcode-wrap').hidden=!state.passcodeRequired;
   $('generate-label').textContent=state.aiReady?'Generate 2 AI replies':'Try 2 demo replies';
   if(!state.image)notice(state.aiReady?'Live AI is connected. Uploaded screenshots are analyzed automatically; no automatic FeetFinder access.':'Demo mode: paste text for sample replies. Live screenshot reading needs a server with an OpenAI API key.');
 }
@@ -712,16 +645,28 @@ function renderPrivateReferences(){const list=$('private-reference-list');list.r
  for(const ref of vault.getReferences()){const row=document.createElement('div');row.className='action-row';const label=document.createElement('label');label.className='checkbox-control';const enabled=document.createElement('input');enabled.type='checkbox';enabled.checked=ref.enabled;enabled.addEventListener('change',async()=>{try{await vault.setReferences(vault.getReferences().map(r=>r.id===ref.id?{...r,enabled:enabled.checked}:r));clearResults();}catch(e){notice(e.message,true);renderPrivateReferences();}});label.append(enabled,document.createTextNode(ref.title));const edit=document.createElement('button');edit.className='subtle-button';edit.textContent='Edit';edit.onclick=()=>{editingReference=ref.id;$('reference-title').value=ref.title;$('reference-text').value=ref.text;$('reference-kind').value=ref.kind;};const del=document.createElement('button');del.className='danger-outline';del.textContent='Delete';del.onclick=async()=>{try{await vault.setReferences(vault.getReferences().filter(r=>r.id!==ref.id));if(editingReference===ref.id)clearReferenceEditor();renderPrivateReferences();clearResults();}catch(e){notice(e.message,true);}};row.append(label,edit,del);list.append(row);}
 }
 function bind(){
- $('legacy-memory-backup').onclick=()=>download('Delilah_Older_Encrypted_Memory_Backup.json',localStorage.getItem(STORAGE_KEY));
- $('memory-enabled').addEventListener('change',async()=>{try{state.requestVersion++;if($('memory-enabled').checked){await vault.unlock();if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.activeBuyer);}else vault.lock();clearResults();refreshVault();}catch(e){notice(e.message,true);}});
 
- $('delete-open-buyer').onclick=()=>$('delete-buyer').click();
- let autosaveTimer; $('message').addEventListener('input',()=>{clearTimeout(autosaveTimer);const owner=state.activeBuyer,version=state.requestVersion;autosaveTimer=setTimeout(()=>{if(owner===state.activeBuyer&&version===state.requestVersion)autosaveBuyerMessage();},700);});$('message').addEventListener('blur',autosaveBuyerMessage);
-
- $('backup-locked-memory').onclick=()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup downloaded');}catch(e){notice(e.message,true);}};
- $('reset-locked-memory').onclick=async()=>{if(!confirm('Reset private memory on this device? This permanently deletes ALL saved buyer chats, settings, notes, creator playbook and personal references in this browser. An encrypted backup still requires your OLD passphrase. Your app sign-in and built-in references are not reset.'))return;try{state.requestVersion++;await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;$('vault-password').value='';clearResults();refreshVault();notice('Private memory reset. Choose a new passphrase of at least 10 characters and tap Create private memory.');$('vault-password').focus();}catch(e){notice(e.message,true);}};
- $('login-form').addEventListener('submit',async e=>{e.preventDefault();const button=$('login-submit');button.disabled=true;$('login-error').textContent='Signing in…';try{await signIn();$('login-error').textContent='';}catch(error){$('login-error').textContent=error.message;}finally{button.disabled=false;}});
- $('sign-out').onclick=async()=>{try{const res=await fetch('/api/logout',{method:'POST',cache:'no-store'});if(!res.ok)throw Error('Could not sign out. Try again.');state.authenticated=false;pendingMemoryPassword=null;await deviceUnlockStore('delete').catch(()=>{});resetScreenshot();$('message').value='';$('notes').value='';state.activeBuyer=null;state.oneoff=true;clearResults();refreshVault();updateAuth();$('login-error').textContent='';}catch(e){notice(e.message,true);}};
+ $('nav-menu').addEventListener('click',()=>{const on=document.body.classList.toggle('show-advanced');$('nav-menu').setAttribute('aria-expanded',String(on));$('nav-menu').textContent=on?'✕ Close menu':'☰ Menu';});
+ $('voice-style').addEventListener('click',()=>{document.body.classList.add('show-advanced');$('nav-menu').textContent='✕ Close menu';$('nav-menu').setAttribute('aria-expanded','true');$('persona-grid').scrollIntoView({block:'center',behavior:'smooth'});});
+ async function revise(instruction){
+   const command=String(instruction||'').trim();if(!command)return notice('Say or type what you want changed first.',true);
+   if(!state.generated)return notice('Generate a reply before changing its style.',true);
+   state.previousGenerated=structuredClone(state.generated);state.revisionInstruction=command;
+   await generate();$('voice-undo').disabled=!state.previousGenerated;
+ }
+ $('voice-apply').addEventListener('click',()=>revise($('voice-command').value));
+ document.querySelectorAll('[data-revise]').forEach(b=>b.addEventListener('click',()=>{$('voice-command').value=b.dataset.revise;revise(b.dataset.revise);}));
+ $('voice-undo').addEventListener('click',()=>{if(!state.previousGenerated)return;const prior=state.previousGenerated;state.previousGenerated=null;state.revisionInstruction='';renderReplies(prior,false);$('voice-undo').disabled=true;toast('Previous replies restored');});
+ $('voice-mic').addEventListener('click',()=>{
+   const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+   if(!Speech){$('voice-status').textContent='Speech recognition is unavailable in this browser. Use the phone keyboard microphone or type your instructions.';return;}
+   try{const recognition=new Speech();recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
+     $('voice-status').textContent='Listening… speak naturally.';
+     recognition.onresult=e=>{const spoken=Array.from(e.results).map(r=>r[0].transcript).join(' ').trim();$('voice-command').value=[$('voice-command').value.trim(),spoken].filter(Boolean).join(' ');$('voice-status').textContent='Heard: '+spoken+' · Tap Update replies to apply.';};
+     recognition.onerror=e=>{$('voice-status').textContent='Microphone unavailable ('+e.error+'). You can still type.';};
+     recognition.start();}catch(e){$('voice-status').textContent='Could not start microphone. Try keyboard dictation or type.';}
+ });
+ $('login-session').onclick=async()=>{try{await requestJson('/api/login',{});$('passcode').value='';$('passcode-wrap').hidden=true;toast('Signed in on this browser for up to 30 days');}catch(e){notice(e.message,true);}};
  $('check-connection').onclick=async()=>{const button=$('check-connection');button.disabled=true;try{const result=await requestJson('/api/check',{});$('connection-check-result').textContent='AI connection verified · '+result.model+'. '+result.scope;}catch(e){$('connection-check-result').textContent=e.message;}finally{button.disabled=false;}};
 
  $('reference-new').onclick=clearReferenceEditor;
@@ -733,22 +678,21 @@ function bind(){
  $('confirm-style').addEventListener('click',()=>{state.styleConfirmed=true;$('confirm-style').hidden=true;$('style-status').textContent='Updated settings confirmed for this screenshot.';});
 
   document.querySelectorAll('[data-group="personality"],[data-group="intensity"]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.group,b.dataset.value)));
-  $('custom-style').addEventListener('change',savePrefs);
   ['length','objective','direction','energy','directness','emoji','profanity','smart-select'].forEach(id=>$(id).addEventListener('change',savePrefs));
   $('vault-auth-button').addEventListener('click',vaultAuth);
   $('vault-password').addEventListener('keydown',e=>{if(e.key==='Enter')vaultAuth();});
-  $('lock-vault').addEventListener('click',async()=>{await deviceUnlockStore('delete').catch(()=>{});state.requestVersion++;vault.lock();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;clearResults();refreshVault();toast('Private memory locked');});
+  $('lock-vault').addEventListener('click',()=>{state.requestVersion++;vault.lock();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;clearResults();refreshVault();toast('Private memory locked');});
   $('chat-search').addEventListener('input',renderBuyerChats);
   $('buyer-select').addEventListener('change',e=>{if(e.target.value)openSavedBuyer(e.target.value);else useOneoff();});
   $('save-buyer-notes').addEventListener('click',async()=>{try{await vault.setBuyerNotes(state.activeBuyer,$('buyer-notes').value);refreshVault();toast('Buyer notes encrypted and saved');}catch(e){notice(e.message,true);}});
   $('save-playbook').addEventListener('click',async()=>{try{await vault.setPlaybook($('playbook').value);toast('Playbook encrypted and saved');}catch(e){notice(e.message,true);}});
   $('export-vault').addEventListener('click',()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup exported');}catch(e){notice(e.message,true);}});
   $('import-vault').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;if(!confirm('Replace existing local buyer memory with the imported encrypted backup? Export a backup first if needed.'))return;
-    try{if(file.size>3_500_000)throw Error('Backup too large.');await deviceUnlockStore('delete').catch(()=>{});await vault.importEncrypted(await file.text());state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('Backup imported · unlock with its passphrase');}catch(error){notice(error.message,true);}finally{e.target.value='';}});
+    try{if(file.size>3_500_000)throw Error('Backup too large.');await vault.importEncrypted(await file.text());state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('Backup imported · unlock with its passphrase');}catch(error){notice(error.message,true);}finally{e.target.value='';}});
   $('delete-buyer').addEventListener('click',async()=>{if(!state.activeBuyer||!vault.unlocked)return;if(!confirm(`Permanently delete ${displayUsername(state.activeBuyer)} and all saved messages?`))return;
     try{await vault.removeBuyer(state.activeBuyer);useOneoff();toast('Buyer history erased');}catch(e){notice(e.message,true);}});
   $('erase-vault').addEventListener('click',async()=>{if(!confirm('Erase ALL encrypted buyer histories and the playbook on this device? This cannot be undone without a backup.'))return;
-    try{await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('All local buyer memory erased');}catch(e){notice(e.message,true);}});
+    try{await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('All local buyer memory erased');}catch(e){notice(e.message,true);}});
   $('image-input').addEventListener('change',e=>useFile(e.target.files?.[0]));
   $('remove-upload').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();resetScreenshot();clearResults();});
   const drop=$('dropzone');['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('dragging');}));
@@ -756,8 +700,8 @@ function bind(){
   document.addEventListener('paste',e=>{if(e.target.matches('textarea,input'))return;const file=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));if(file){e.preventDefault();useFile(file);}});
   $('analyze').addEventListener('click',analyze);
   $('clear-chat').addEventListener('click',()=>{resetScreenshot();state.requestVersion++;$('message').value='';$('notes').value='';state.identityPending=false;clearResults();refreshIdentity();showSwitchAlert('');notice('Current screenshot and text cleared from this page. Encrypted saved history was not deleted.');});
-  $('confirm-detected').addEventListener('click',()=>activateBuyer(state.pendingDisplay||state.pendingBuyer,state.analysis?.confidence!=='high'));
-  $('confirm-current').addEventListener('click',()=>activateBuyer(state.activeBuyer,true));
+  $('confirm-detected').addEventListener('click',async()=>{await activateBuyer(state.pendingDisplay||state.pendingBuyer,state.analysis?.confidence!=='high');if(state.image&&$('message').value.trim())await generate();});
+  $('confirm-current').addEventListener('click',async()=>{await activateBuyer(state.activeBuyer,true);if(state.image&&$('message').value.trim())await generate();});
   $('use-oneoff').addEventListener('click',useOneoff);
   $('use-manual').addEventListener('click',()=>activateBuyer($('manual-username').value,true));
   $('load-sample').addEventListener('click',()=>{resetScreenshot();$('message').value='Hey, I like your sense of humor. What have you been up to?';$('notes').value='Demo example only. This is an adult buyer.';state.identityPending=false;clearResults();refreshIdentity();toast('Sample message loaded');});

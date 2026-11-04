@@ -1,0 +1,34 @@
+DELILAH REPLY ASSISTANT V4 — LOCAL TEST RESULTS
+================================================
+Date: November 3, 2026
+
+PASS — Browser UI functional tests (Chromium with simulated mobile viewport;
+         mock AI responses and mock cryptography for browser harness):
+  * Full settings menu shown by default, with Flirty/Auto/Match buyer/
+    Get to the point/Stay on topic/Emojis off correctly preselected.
+  * Style buttons correctly change their selected/highlighted appearance.
+  * Automatic buyer detection routes new JulianR9423 screenshot to
+    separate "JulianR9423 FF" chat.
+  * NewBuyer123 screenshot creates "NewBuyer123 FF" and shows buyer-switch alert.
+  * Returning JulianR9423 screenshot reopens original chat, without duplicates.
+  * Separate buyer histories are included only for their own buyer in AI
+    reply requests. A different buyer's history was empty.
+  * Uncertain username was not automatically assigned to another buyer.
+  * Search filters the buyer chat list by username.
+  * No JavaScript runtime errors in tested scenarios.
+
+PASS — Actual crypto tests (Node.js WebCrypto, NOT mock crypto):
+  * PBKDF2-derived AES-GCM encryption; raw stored blob does not expose text.
+  * Buyer profile names preserve their visible capitalization.
+  * New/returning buyer history stays separate after vault unlock.
+  * Wrong passphrase correctly fails and individual buyer deletion works.
+
+PASS — Node.js server syntax and local /api/status response.
+
+NOT TESTED — A real OpenAI API request with a user's credentials. The app
+requires OPENAI_API_KEY configured server-side; screenshot recognition and
+AI-generated replies will not work from the standalone HTML file alone.
+
+NOTE — Browser UI tests use an about:blank test harness because the container
+blocks Chromium navigation to local files/servers. Browser cryptography is
+simulated in that harness, and real AES-GCM was tested separately in Node.

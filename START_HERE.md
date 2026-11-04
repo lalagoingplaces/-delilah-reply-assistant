@@ -1,62 +1,13 @@
-# Delilah personal app — hosting setup
+# Start here — Delilah Reply Assistant V4.3
 
-This is a prepared Node app, not a deployed website. Keep this bundle private:
-it contains Delilah's voice examples and the supplied third-party reference text.
+This is the **in-place upgrade of the V4 app**. Do not create a second deployment if you want the same URL. Read `UPGRADE_V4_3.md` first, especially the encrypted-backup instructions.
 
-## What is ready
+**Daily use:** Open the app -> Add screenshot -> review two generated replies -> Copy. Once results appear, say/type what to change in the voice and text box, or use the optional style chips. The full buyer and reference controls are in **Menu**.
 
-- Screenshot analysis, private buyer routing, two AI replies and source audit.
-- Seven personalities, Smart Select, per-buyer settings, screenshot confirmation.
-- Encrypted local memory and editable private TXT/Markdown references.
-- Hosting blueprint, automated checks, health endpoint, synthetic AI check.
+**Live AI:** Set `OPENAI_API_KEY` in the existing secure hosting environment. Set `APP_PASSCODE` (12+ chars) for public hosting. Set `OPENAI_MODEL` to a supported model you have verified for image input and structured JSON responses. The included model value is a legacy starting value, not a live-verified choice. Open the HTTPS site and use Menu -> Server access -> Sign in & remember this browser. Test real screenshots before relying on results.
 
-## Account connections
+**Private buyer memory:** Unlock the encrypted buyer vault through Menu. It stays encrypted on this browser, using the original V4 storage key. It cannot be restored without the passphrase or a usable backup. The app does not claim to remember buyers across different browsers or domains.
 
-Connect OpenAI Developers to configure API credentials through the supported
-secure setup. Connect Render to deploy this Node app. Never paste API keys into
-ChatGPT messages, HTML files, Git commits or buyer-facing settings. Set the key
-in the hosting service's OPENAI_API_KEY secret.
+**Voice:** Tap Speak where supported; otherwise use Samsung keyboard dictation into the voice-input field. Speak conversationally, e.g. “I like number two but make it more playful and shorter,” or “Here's exactly what I want to say...” Then tap Update replies. The speech transcript is visible so Delilah can correct errors.
 
-The existing model setting is gpt-4.1-mini. Its documentation marks it deprecated;
-confirm available model access and select a supported image-input/structured-output
-model in OPENAI_MODEL before live use. A real API check is required; a configured
-key does not prove working billing, model access, screenshot reading or reply quality.
-
-## Deploy from a private repository
-
-Place this folder's CONTENTS at the private repository root. The render.yaml
-blueprint runs npm test then npm start. It starts on the free plan for initial
-testing; choose paid hosting later if its behavior warrants the cost. This is a
-proposal, not an already created service or subscription.
-
-Render generates APP_PASSCODE. Retrieve it from your hosting environment and
-enter it in the app's Server access passcode field. Use a different passphrase
-for encrypted private memory. HOST is 0.0.0.0 for hosting; PORT is assigned by the
-hosting service. /health only verifies the web process, not the AI provider.
-
-## Check the hosted app
-
-1. Open the HTTPS address in Chrome on her phone.
-2. Enter its server passcode and tap Test AI connection. This makes one small
-   billable request using synthetic text; it does not use private buyer messages.
-3. Create/unlock private memory. Add a short personal voice reference.
-4. Upload a cropped test screenshot. Confirm the buyer and answer Yes or No.
-5. Generate two replies. Check the buyer, settings, reply tone, and source excerpts.
-6. Export an encrypted backup. Verify import on a separate browser before relying
-   on it. Keep both the backup and its private passphrase secure.
-
-Memory is local to the exact browser and site address. A new device, browser,
-custom domain or cleared browser data requires backup/import. A local HTML demo
-and the hosted app do not automatically share memory.
-
-## Local checks
-
-Use Node 22 or later. npm test runs the reference/API mocks, real encryption tests
-and simulated workflow checks. No dependencies need installing. npm start starts
-the app; set environment variables in your shell (see README.txt), because
-.env.example is documentation and .env is not loaded automatically.
-
-## Verification limits
-
-Automated checks passed with a mocked AI provider. No real API key, production
-hosting, visual browser check, or physical-phone test has been completed yet.
+**No live deployment has been performed from this package.** Build checks and simulated API tests are local only. Phone microphone and real buyer screenshots need acceptance testing.

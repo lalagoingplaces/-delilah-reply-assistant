@@ -63,7 +63,14 @@ test('private references are scoped to the supplied request and disabled entries
  assert.throws(()=>selectReferences({privateReferences:[a,a]}),/Invalid/);
  assert.throws(()=>selectReferences({privateReferences:[{...a,text:'x'.repeat(12001)}]}),/Invalid/);
 });
-test('API rejects screenshot generation without style confirmation',async()=>{
+test('automatic screenshot flow accepts unconfirmed style and supports freeform revision',async()=>{
  const {generate}=await import('./server.mjs');
- await assert.rejects(generate({message:'Hi',screenshotRequest:true,styleConfirmed:false}),/Confirm the style/);
+ const real=globalThis.fetch;let providerCalls=0;
+ globalThis.fetch=async(url,opts)=>{if(String(url).includes('api.openai.com')){
+   providerCalls++;const payload=JSON.parse(opts.body);const input=JSON.parse(payload.input[0].content);
+   assert.equal(input.revisionInstruction,'Make option 2 shorter, like how I talk');
+   assert.equal(input.previousSuggestions.length,2);
+   return {ok:true,json:async()=>({output:[{content:[{type:'output_text',text:JSON.stringify({context:'Test',selected_style:'natural',used_reference_ids:[],suggestions:[{label:'One',reply:'Hi there',why:'short'},{label:'Two',reply:'Hey you',why:'casual'}]})}]}]})};
+ }return real(url,opts);};
+ try{const out=await generate({message:'Hello',screenshotRequest:true,styleConfirmed:false,revisionInstruction:'Make option 2 shorter, like how I talk',previousSuggestions:['Hello, thank you','Good to hear from you'],personality:'natural'});assert.equal(out.suggestions.length,2);assert.equal(providerCalls,1);}finally{globalThis.fetch=real;}
 });
