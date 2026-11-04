@@ -403,7 +403,7 @@ function busy(which,on){state.loading=on;for(const id of ['analyze','generate','
 function clearResults(){$('reference-audit').hidden=true;$('reference-sources').replaceChildren();state.generated=null;state.generationBuyer=null;$('results').replaceChildren();$('results').hidden=true;$('results-bottom').hidden=true;$('context-wrap').hidden=true;$('empty-results').hidden=false;}
 function buyerName(key){return vault.unlocked?vault.getBuyer(key)?.displayName||key:key;}
 function chatTitle(key){return `${buyerName(key)} FF`;}
-function activeLabel(){return state.activeBuyer&&!state.oneoff?chatTitle(state.activeBuyer):'One-off · no history';}
+function activeLabel(){return state.activeBuyer&&!state.oneoff?chatTitle(state.activeBuyer):'Waiting for a buyer';}
 function showSwitchAlert(message){const el=$('chat-switch-alert');el.textContent=message||'';el.hidden=!message;}
 function renderBuyerChats(){
   const list=$('chat-list'),term=$('chat-search').value.trim().toLowerCase();list.replaceChildren();
@@ -437,7 +437,7 @@ function refreshIdentity(){
       $('confirm-current').hidden=!state.activeBuyer||state.oneoff;
     }
   }
-  const text=state.identityPending?'Buyer identity needs your confirmation before saved history can be used.':state.oneoff?'One-off mode: no saved buyer history is used or updated.':`Messages will only use ${displayUsername(state.activeBuyer)}'s profile${vault.unlocked?', if history is enabled':''}.`;
+  const text=state.identityPending?'Buyer identity needs confirmation so histories stay separate.':state.oneoff?'Upload a screenshot and AI will recognize or create the buyer profile. Memory stays on.':`Messages will only use ${displayUsername(state.activeBuyer)}'s profile${vault.unlocked?', if history is enabled':''}.`;
   $('identity-text').textContent=text;
   $('buyer-notes').disabled=!vault.unlocked||state.oneoff||!state.activeBuyer;
   $('save-buyer-notes').disabled=$('buyer-notes').disabled;
@@ -716,7 +716,42 @@ function bind(){
  $('voice-apply').addEventListener('click',()=>revise($('voice-command').value));
  document.querySelectorAll('[data-revise]').forEach(b=>b.addEventListener('click',()=>{$('voice-command').value=b.dataset.revise;revise(b.dataset.revise);}));
  $('voice-undo').addEventListener('click',()=>{if(!state.previousGenerated)return;const prior=state.previousGenerated;state.previousGenerated=null;state.revisionInstruction='';renderReplies(prior,false);$('voice-undo').disabled=true;toast('Previous replies restored');});
- $('voice-mic').addEventListener('click',()=>{
+ // First-screen microphone and dictation: native speech recognition where supported.
+  $('quick-mic').addEventListener('click',()=>{
+    const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!Speech){$('quick-voice-status').textContent='Use the keyboard microphone on your phone, or type in the box.';$('quick-draft').focus();return;}
+    try{
+      const recognition=new Speech();recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
+      $('quick-voice-status').textContent='Listening… talk naturally.';
+      recognition.onresult=e=>{const spoken=Array.from(e.results).map(r=>r[0].transcript).join(' ').trim();$('quick-draft').value=[$('quick-draft').value.trim(),spoken].filter(Boolean).join(' ');$('quick-voice-status').textContent='Heard: '+spoken;};
+      recognition.onerror=e=>{$('quick-voice-status').textContent='Microphone unavailable ('+e.error+'). Use keyboard dictation or type.';};
+      recognition.start();
+    }catch(e){$('quick-voice-status').textContent='Microphone could not start. Use phone keyboard dictation or type.';}
+  });
+  $('quick-copy').addEventListener('click',async()=>{
+    const own=$('quick-draft').value.trim();if(!own)return notice('Speak or type your own message first.',true);
+    try{
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(own);
+      else {const temp=document.createElement('textarea');temp.value=own;document.body.append(temp);temp.select();if(!document.execCommand('copy'))throw Error('Copy blocked');temp.remove();}
+      $('quick-voice-status').textContent='Copied exactly what you said, without rewriting it.';toast('Your own words copied');
+    }catch(e){notice('Copy was blocked. Select and copy your words manually.',true);}
+  });
+  $('quick-polish').addEventListener('click',async()=>{
+    const draft=$('quick-draft').value.trim();
+    if(!draft)return notice('Speak or type something for AI to improve.',true);
+    if(state.loading)return;
+    if(!state.aiReady)return notice('AI is unavailable. You can still copy your own words.',true);
+    if(state.passcodeRequired){$('inline-access').hidden=false;return notice('Sign in once above to use AI.',true);}
+    if(state.generated){await revise(draft);return;}
+    busy('generate',true);const version=state.requestVersion;
+    try{
+      const response=await requestJson('/api/polish',{draft,instruction:'Keep Delilah’s meaning and everyday texting voice. Offer two polished versions.',buyerContext:[state.analysis?.conversation_excerpt||'',state.analysis?.last_buyer_message||'',$('message').value||''].filter(Boolean).join('\n').slice(0,2000),ageConcern:state.analysis?.age_concern===true});
+      if(version!==state.requestVersion)return;
+      renderReplies(response,false);$('quick-voice-status').textContent='AI polished your dictated message. Choose one below.';
+    }catch(e){notice(e.message||'AI could not polish your message.',true);}
+    finally{busy('generate',false);}
+  });
+  $('voice-mic').addEventListener('click',()=>{
    const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
    if(!Speech){$('voice-status').textContent='Speech recognition is unavailable in this browser. Use the phone keyboard microphone or type your instructions.';return;}
    try{const recognition=new Speech();recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
