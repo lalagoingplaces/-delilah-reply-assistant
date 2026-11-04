@@ -78,24 +78,33 @@
 body:not(.show-advanced) .vault-banner,body:not(.show-advanced) .buyer-chat-panel,body:not(.show-advanced) #persona-grid,body:not(.show-advanced) #persona-description,body:not(.show-advanced) #advanced-settings,body:not(.show-advanced) #custom-wrap,body:not(.show-advanced) #passcode-wrap,body:not(.show-advanced) .settings-heading,body:not(.show-advanced) #style-question,body:not(.show-advanced) #confirm-style,body:not(.show-advanced) #analyze,body:not(.show-advanced) #notes,body:not(.show-advanced) label[for="notes"],body:not(.show-advanced) #load-sample,body:not(.show-advanced) #reference-audit{display:none!important}
 body:not(.show-advanced) .hero{padding:23px 0 18px}body:not(.show-advanced) .hero h1{font-size:clamp(32px,5vw,48px);margin:10px 0}body:not(.show-advanced) .hero-pills{display:none}body:not(.show-advanced) .workspace{grid-template-columns:minmax(0,1fr);max-width:680px;margin:auto}body:not(.show-advanced) .results-panel{min-height:0}body:not(.show-advanced) .panel{padding:20px}body:not(.show-advanced) .dropzone{min-height:150px}body:not(.show-advanced) .identity-box .manual-select{display:none}body:not(.show-advanced) .identity-box{margin-top:12px}body:not(.show-advanced) #message{min-height:76px}body:not(.show-advanced) .panel .divider{display:none}body:not(.show-advanced) .fineprint{margin-top:6px}
 @media(max-width:570px){.nav-menu{font-size:12px;padding:8px;margin-right:5px}.topbar{height:72px}.topbar .status{padding:6px;font-size:9px}.brandname{font-size:23px}.voice-compose{flex-wrap:wrap}.voice-compose textarea{min-width:100%}.voice-compose #voice-mic{width:100%}}
+
+/* V4.4: Clear iPhone browser bar and keep Menu below status overlays. */
+.inline-access,.quick-dictation{margin:16px 0;padding:14px;border:1px solid #80536f;border-radius:16px;background:#271d2d}
+.inline-access p,.quick-dictation p{color:var(--muted);font-size:12px;line-height:1.55}
+.inline-access strong,.quick-dictation label{font-weight:750;font-size:13px;color:#f5d9e8}
+.inline-access input,.quick-dictation textarea{display:block;width:100%;margin:9px 0 10px;padding:12px;border-radius:10px;border:1px solid #805b79;background:#120e19;color:#fff;min-height:46px}
+.quick-dictation-actions{display:flex;flex-wrap:wrap;gap:8px}
+.quick-dictation-actions button,.inline-access button{min-height:44px}
+@media(max-width:570px){.topbar{height:auto;min-height:150px;padding-top:max(94px,env(safe-area-inset-top,0px));padding-bottom:14px;align-items:center;flex-wrap:wrap;gap:9px}.topbar .brand{min-width:0;flex:1 1 170px}.topbar .nav-menu{min-height:48px;margin:0;padding:11px 13px;flex-shrink:0}.topbar .status{order:3;width:100%;justify-content:center}.brandname{font-size:21px}}
 </style>
-  <title>Delilah Reply Assistant · V4.3 · Smart Flow</title>
+  <title>Delilah Reply Assistant · V4.4 · Smart Flow</title>
 </head>
 <body>
   <div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
   <div class="shell">
-    <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT · V4.3</span></span></div><button class="subtle-button nav-menu" type="button" id="nav-menu" aria-expanded="false">☰ Menu</button><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
+    <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT · V4.4</span></span></div><button class="subtle-button nav-menu" type="button" id="nav-menu" aria-expanded="false">☰ Menu</button><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
     <main>
       <section class="hero hero-v3"><div class="eyebrow"><span class="eyebrow-line"></span> DELILAH'S VOICE · PRIVATE BY DESIGN</div><h1>Her voice. <em>Every reply.</em></h1><p>Add a screenshot. AI recognizes the buyer and writes <strong>two natural replies automatically</strong>. Copy one, or tell it what to change.</p><div class="hero-pills"><span>♡ Flirty by default</span><span>♧ Encrypted buyer memory</span><span>✧ Review before sending</span></div></section>
       <section class="vault-banner" aria-labelledby="vault-heading">
-        <div class="vault-heading"><div><span class="step">PRIVATE MEMORY</span><h2 id="vault-heading">Buyers stay in their own lane.</h2><p id="vault-state">Unlock or create a private vault to remember buyers on this device.</p></div><span class="vault-symbol">♧</span></div>
+        <div class="vault-heading"><div><span class="step">PRIVATE MEMORY</span><h2 id="vault-heading">Buyers stay in their own lane.</h2><p id="vault-state">Buyer memory is always on. Chats inactive for 30 days are deleted automatically.</p></div><span class="vault-symbol">♧</span></div>
         <div id="vault-locked" class="vault-auth"><label class="field-label" for="vault-password">Private memory passphrase <span>never sent to the AI or server</span></label><div class="vault-auth-row"><input id="vault-password" type="password" autocomplete="off" placeholder="At least 10 characters"><button type="button" class="small-primary" id="vault-auth-button">Create private memory</button></div><p class="micro-copy" id="vault-auth-help">Use a unique passphrase; there is no recovery if it is lost. Without a vault you can still generate one-off replies.</p></div>
         <div id="vault-unlocked" class="vault-content" hidden>
-          <div class="vault-toolbar"><label for="buyer-select" class="field-label">Saved buyers</label><select id="buyer-select"><option value="">Select a buyer…</option></select><button type="button" class="subtle-button" id="lock-vault">Lock memory</button></div>
+          <div class="vault-toolbar"><label for="buyer-select" class="field-label">Saved buyers</label><select id="buyer-select"><option value="">Select a buyer…</option></select><button type="button" class="subtle-button" id="lock-vault" hidden>Lock memory</button></div>
           <div class="vault-details"><label for="buyer-notes" class="field-label">Notes for this buyer <span>encrypted on this device</span></label><textarea id="buyer-notes" rows="2" maxlength="1000" placeholder="Past topics, preferences, agreed boundaries…" disabled></textarea><button type="button" class="subtle-button" id="save-buyer-notes" disabled>Save buyer notes</button>
             <details class="playbook-details"><summary>Delilah's saved creator playbook</summary><label class="field-label" for="playbook">Optional factual guidance for all buyers</label><textarea id="playbook" rows="4" maxlength="2000"></textarea><button type="button" class="subtle-button" id="save-playbook">Save playbook</button></details>
           </div>
-          <details class="privacy-details"><summary>My private references</summary><p class="micro-copy">Saved encrypted on this device. Enabled references may be sent to AI for your requested replies. Import your own TXT or Markdown files, or paste text. Maximum 20 references, 12,000 characters each. Enable up to four voice/offerings references. Their first 3,000/2,500 characters are supplied; guidance is searched for matching passages.</p><div id="private-reference-list"></div><label class="field-label" for="reference-title">Reference title</label><input id="reference-title" type="text" maxlength="100"><label class="field-label" for="reference-kind">Purpose</label><select id="reference-kind"><option value="voice">My voice samples</option><option value="guidance">Conversation guidance</option><option value="offerings">Offerings and boundaries</option></select><label class="field-label" for="reference-text">Reference text</label><textarea id="reference-text" maxlength="12000"></textarea><input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown"><div class="action-row"><button type="button" id="reference-save" class="small-primary">Save reference</button><button type="button" id="reference-new" class="subtle-button">New reference</button></div></details><details class="privacy-details"><summary>Privacy and backup controls</summary><div class="privacy-actions"><label class="checkbox-control"><input type="checkbox" id="include-history" checked> Include this buyer's saved messages in AI replies</label><label class="checkbox-control"><input type="checkbox" id="save-incoming" checked> Save this buyer's incoming chat text in encrypted memory</label><div class="action-row"><button type="button" id="export-vault" class="subtle-button">Export encrypted backup</button><label class="file-button">Import encrypted backup<input id="import-vault" type="file" accept=".json,application/json" hidden></label></div><div class="action-row"><button type="button" id="delete-buyer" class="danger-outline" disabled>Delete selected buyer</button><button type="button" id="erase-vault" class="danger-outline">Erase all buyer memory</button></div><p class="micro-copy">Conversation text, notes, buyer settings, and private references are encrypted here; screenshots are never saved. Data lives in this browser on this device. Clearing Safari website data removes it; export a backup first if needed.</p></div></details>
+          <details class="privacy-details"><summary>My private references</summary><p class="micro-copy">Saved encrypted on this device. Enabled references may be sent to AI for your requested replies. Import your own TXT or Markdown files, or paste text. Maximum 20 references, 12,000 characters each. Enable up to four voice/offerings references. Their first 3,000/2,500 characters are supplied; guidance is searched for matching passages.</p><div id="private-reference-list"></div><label class="field-label" for="reference-title">Reference title</label><input id="reference-title" type="text" maxlength="100"><label class="field-label" for="reference-kind">Purpose</label><select id="reference-kind"><option value="voice">My voice samples</option><option value="guidance">Conversation guidance</option><option value="offerings">Offerings and boundaries</option></select><label class="field-label" for="reference-text">Reference text</label><textarea id="reference-text" maxlength="12000"></textarea><input type="file" id="reference-file" accept=".txt,.md,text/plain,text/markdown"><div class="action-row"><button type="button" id="reference-save" class="small-primary">Save reference</button><button type="button" id="reference-new" class="subtle-button">New reference</button></div></details><details class="privacy-details"><summary>Privacy and backup controls</summary><div class="privacy-actions"><input type="checkbox" id="include-history" checked hidden><input type="checkbox" id="save-incoming" checked hidden><p class="micro-copy">Buyer history always saves automatically. Chats are deleted after 30 days with no messages, or individually with the Delete selected buyer button.</p><div class="action-row"><button type="button" id="export-vault" class="subtle-button">Export encrypted backup</button><label class="file-button">Import encrypted backup<input id="import-vault" type="file" accept=".json,application/json" hidden></label></div><div class="action-row"><button type="button" id="delete-buyer" class="danger-outline" disabled>Delete selected buyer</button><button type="button" id="erase-vault" class="danger-outline">Erase all buyer memory</button></div><p class="micro-copy">Conversation text, notes, buyer settings, and private references are encrypted here; screenshots are never saved. Data lives in this browser on this device. Clearing Safari website data removes it; export a backup first if needed.</p></div></details>
         </div>
       </section>
 
@@ -109,9 +118,11 @@ body:not(.show-advanced) .hero{padding:23px 0 18px}body:not(.show-advanced) .her
         <section class="panel compose-panel" aria-labelledby="compose-title">
           <div class="panel-top"><div><span class="step">01 / THE CHAT</span><h2 id="compose-title">What did they say?</h2></div><span class="panel-icon">✳</span></div>
           <p class="section-helper">Add a screenshot and AI does the rest. Only unclear buyer names need confirmation.</p>
-          <div class="dropzone" id="dropzone"><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/*" aria-label="Upload a conversation screenshot"><div id="empty-upload" class="drop-inner"><div class="upload-icon">↥</div><strong>Add a chat screenshot</strong><span>Tap to choose from Photos, or drag and drop</span><small>PNG, JPG, WEBP · screenshot stays in this session</small></div><div class="upload-preview" id="upload-preview" hidden><img id="preview-image" alt="Selected buyer conversation screenshot"><div class="upload-info"><strong id="upload-filename"></strong><span>Ready to analyze</span></div><button type="button" class="remove-upload" id="remove-upload" aria-label="Remove screenshot">×</button></div></div>
-          <div class="action-row screenshot-actions"><button type="button" class="small-primary" id="analyze" disabled>✧ Analyze again</button><button type="button" class="subtle-button" id="clear-chat">Clear chat</button></div>
-          <div id="chat-switch-alert" role="status" hidden></div><div class="identity-box" aria-live="polite"><div class="identity-top"><span class="identity-label">CURRENT BUYER</span><strong id="active-buyer">One-off · no history</strong></div><p id="identity-text">Add a screenshot or select an existing buyer. We won't guess when a name is cropped.</p><div id="identity-warning" class="identity-warning" hidden><strong id="identity-warning-title">Possible buyer switch</strong><p id="identity-warning-body"></p><div class="action-row"><button type="button" id="confirm-detected" class="small-primary" hidden>Confirm buyer</button><button type="button" id="confirm-current" class="subtle-button" hidden>Keep current buyer (I verified)</button><button type="button" id="use-oneoff" class="subtle-button">Use without buyer history</button></div></div>
+          <div class="dropzone" id="dropzone"><input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/*" aria-label="Upload a conversation screenshot"><div id="empty-upload" class="drop-inner"><div class="upload-icon">↥</div><strong>Add a chat screenshot</strong><span>Tap to choose from Photos, or drag and drop</span><small>PNG, JPG, WEBP · screenshot stays in this session</small></div><div class="upload-preview" id="upload-preview" hidden><img id="preview-image" alt="Selected buyer conversation screenshot"><div class="upload-info"><strong id="upload-filename"></strong><span id="upload-state">Ready to analyze</span></div><button type="button" class="remove-upload" id="remove-upload" aria-label="Remove screenshot">×</button></div></div>
+          <section id="inline-access" class="inline-access" hidden><strong>Sign in once to use AI</strong><p>Enter the private app passcode once on this phone. AI will stay ready on future visits.</p><label for="quick-passcode" class="field-label">App passcode</label><input id="quick-passcode" type="password" autocomplete="off" placeholder="Private app access passcode"><button type="button" class="small-primary" id="quick-signin-btn">Sign in &amp; analyze</button></section>
+<div class="quick-dictation"><label for="quick-draft">🎙 Speak or type naturally</label><textarea id="quick-draft" rows="2" maxlength="1600" placeholder="Say your own reply, or tell AI to make it naughtier, sweeter, or shorter…"></textarea><div class="quick-dictation-actions"><button type="button" class="small-primary" id="quick-mic">🎙 Speak</button><button type="button" class="subtle-button" id="quick-copy">Copy my words</button><button type="button" class="subtle-button" id="quick-polish">✦ Ask AI</button></div><p id="quick-voice-status" class="micro-copy">Phone keyboard dictation also works if browser speech recognition is unsupported.</p></div>
+<div class="action-row screenshot-actions"><button type="button" class="small-primary" id="analyze" disabled>✧ Analyze again</button><button type="button" class="subtle-button" id="clear-chat">Clear chat</button></div>
+          <div id="chat-switch-alert" role="status" hidden></div><div class="identity-box" aria-live="polite"><div class="identity-top"><span class="identity-label">CURRENT BUYER</span><strong id="active-buyer">One-off · no history</strong></div><p id="identity-text">Add a screenshot or select an existing buyer. We won't guess when a name is cropped.</p><div id="identity-warning" class="identity-warning" hidden><strong id="identity-warning-title">Possible buyer switch</strong><p id="identity-warning-body"></p><div class="action-row"><button type="button" id="confirm-detected" class="small-primary" hidden>Confirm buyer</button><button type="button" id="confirm-current" class="subtle-button" hidden>Keep current buyer (I verified)</button><button type="button" id="use-oneoff" class="subtle-button" hidden>Use without buyer history</button></div></div>
             <div class="manual-select"><label class="field-label" for="manual-username">Or confirm a buyer username yourself</label><div class="manual-row"><input id="manual-username" type="text" maxlength="49" placeholder="Buyer username (not Delilah's)"><button type="button" id="use-manual" class="subtle-button">Use buyer</button></div></div>
           </div>
           <label class="field-label field-gap" for="message">Buyer's last message <span>optional after screenshot analysis</span></label><textarea id="message" rows="3" maxlength="4000" placeholder="Paste what the buyer actually said…"></textarea><div class="field-bottom"><span id="screenshot-summary">No screenshot has been analyzed.</span><button type="button" class="text-link" id="load-sample">Load safe example ↗</button></div>
@@ -142,10 +153,10 @@ body:not(.show-advanced) .hero{padding:23px 0 18px}body:not(.show-advanced) .her
             <div class="action-row"><button type="button" id="voice-apply" class="small-primary">✦ Update replies</button><button type="button" id="voice-undo" class="subtle-button" disabled>↶ Undo</button><button type="button" id="voice-style" class="subtle-button">More styles</button></div>
             <p class="micro-copy" id="voice-status">Speech recognition depends on browser support and microphone permission. Typed instructions always work.</p>
           </section>
-          <div class="privacy-note"><span class="lock-icon">♧</span><div><b>Private, not invisible</b><p>Only screenshots you upload are analyzed. Screenshots are kept in page memory, never in the encrypted vault. Buyer histories are encrypted in this browser if you turn on memory; an unlocked vault is required. Live AI sends the message, optional selected buyer history and uploaded screenshot to OpenAI for processing. The server has no chat database. No automatic FeetFinder access or sending.</p><p>To reduce exposure, crop unrelated personal information before uploading. AI recognition can be wrong; confirm buyer identities.</p></div></div>
+          <div class="privacy-note"><span class="lock-icon">♧</span><div><b>Private, not invisible</b><p>Only screenshots you upload are analyzed. Screenshots are kept in page memory, never in the encrypted vault. Buyer histories are encrypted in this browser and cleaned after 30 days without new messages. It unlocks automatically using this browser's device key. Live AI sends the message, optional selected buyer history and uploaded screenshot to OpenAI for processing. The server has no chat database. No automatic FeetFinder access or sending.</p><p>To reduce exposure, crop unrelated personal information before uploading. AI recognition can be wrong; confirm buyer identities.</p></div></div>
         </section>
       </div>
-      <footer><span>DELILAH REPLY ASSISTANT · V4.3</span><span>iPhone: open the hosted HTTPS site in Safari → Share → Add to Home Screen.</span></footer>
+      <footer><span>DELILAH REPLY ASSISTANT · V4.4</span><span>iPhone: open the hosted HTTPS site in Safari → Share → Add to Home Screen.</span></footer>
     </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -245,6 +256,7 @@ function trimmedHistory(items) {
 
 // Encrypted, browser-only conversation storage. No server-side database.
 const STORAGE_KEY='delilah-v3-encrypted-vault';
+const DEVICE_MEMORY_KEY='delilah-v4-device-memory-secret';
 const ITERATIONS=210000;
 const encoder=new TextEncoder(); const decoder=new TextDecoder();
 function bytesToBase64(bytes) { let str=''; for(let i=0;i<bytes.length;i+=8192)str+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(str); }
@@ -298,7 +310,7 @@ class EncryptedVault {
   async ensureBuyer(username){
     const key=safeHandle(username),displayName=cleanDisplayHandle(username);if(!key)throw new Error('Enter a valid buyer username.');
     if(this.data?.buyers.some(b=>b.username===key))return false;
-    await this.update(d=>{if(!d.buyers.some(b=>b.username===key))d.buyers.push({username:key,displayName:displayName||key,notes:'',events:[],updated:Date.now()});});
+    await this.update(d=>{if(!d.buyers.some(b=>b.username===key))d.buyers.push({username:key,displayName:displayName||key,notes:'',events:[],updated:Date.now(),lastMessageAt:Date.now()});});
     return true;
   }
   async addProfileObservation(username,observation){
@@ -314,18 +326,36 @@ class EncryptedVault {
     await this.update(d=>{
       const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');
       const duplicate=b.events.filter(e=>e.kind==='incoming').slice(-4).some(e=>e.content===text);
-      if(!duplicate)b.events.push({kind:'incoming',content:text,source:source==='screenshot'?'screenshot':'chat',time:Date.now()});
+      if(!duplicate)b.events.push({kind:'incoming',content:text,source:source==='screenshot'?'screenshot':'chat',time:Date.now()});b.lastMessageAt=Date.now();
       b.events=b.events.slice(-80);b.updated=Date.now();
     });
   }
   async markSent(username,content){
     const key=safeHandle(username);const text=String(content||'').trim().slice(0,1600);
     if(!key||!text)return;
-    await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');b.events.push({kind:'sent',content:text,time:Date.now()});b.events=b.events.slice(-80);b.updated=Date.now();});
+    await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');b.events.push({kind:'sent',content:text,time:Date.now()});b.events=b.events.slice(-80);b.updated=Date.now();b.lastMessageAt=Date.now();});
   }
   async setBuyerNotes(username,notes){const key=safeHandle(username);await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');b.notes=String(notes||'').slice(0,1000);b.updated=Date.now();});}
   async setPlaybook(value){await this.update(d=>{d.playbook=String(value||'').slice(0,2000);});}
   async removeBuyer(username){const key=safeHandle(username);await this.update(d=>{d.buyers=d.buyers.filter(b=>b.username!==key);});}
+  async pruneInactive(days=30,now=Date.now()){
+    if(!this.unlocked)return 0;
+    let removed=0,cutoff=now-days*86400000;
+    await this.update(d=>{
+      let previous=d.buyers.length;
+      d.buyers=d.buyers.filter(b=>{
+        const last=Number(b.lastMessageAt)||Math.max(0,...(b.events||[]).map(e=>Number(e.time)||0))||Number(b.updated)||now;
+        return last>cutoff;
+      });
+      removed=previous-d.buyers.length;
+    });
+    return removed;
+  }
+  async rotateToDeviceKey(secret){
+    if(!this.unlocked)throw Error('Unlock older memory first.');
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    this.key=await this.derive(secret,salt);this.salt=salt;await this.save();
+  }
   async eraseAll(){this.lock();this.storage.removeItem(STORAGE_KEY);}
   exportEncrypted(){if(!this.exists)throw new Error('No encrypted memory to export.');return this.storage.getItem(STORAGE_KEY);}
   async importEncrypted(serialized){
