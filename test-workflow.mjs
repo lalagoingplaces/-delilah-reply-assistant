@@ -60,3 +60,9 @@ elements.get('login-password').value='synthetic-login-password';await h.signIn()
 elements.get('vault-password').value='old-private-memory-password';await h.vaultAuth();assert(h.vault.unlocked);assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
 h.vault.lock();await h.vault.unlock('synthetic-login-password');assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
 console.log('PASS: login gate, automatic encrypted memory, remembered nonextractable key, reload, signout cleanup and lossless legacy passphrase migration.');
+
+await testDeviceStore('delete');h.vault.lock();h.state.rememberUntil=null;await h.status();
+assert.equal(h.state.rememberUntil,account.rememberUntil,'Remembered login lifetime must survive missing local unlock key');
+elements.get('vault-password').value='synthetic-login-password';await h.vaultAuth();assert(deviceRecord?.key,'Unlock must remember its key after recovering a missing device key');
+h.vault.lock();await h.status();assert(h.vault.unlocked,'Recovered key must unlock on next reload');
+console.log('PASS: missing remembered key recovery persists across reload.');
