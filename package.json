@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test test-references.mjs && node test-vault.mjs && node test-workflow.mjs"
+    "test": "node --test test-references.mjs && node test-vault.mjs && node test-workflow.mjs && node test-session.mjs"
   }
 }

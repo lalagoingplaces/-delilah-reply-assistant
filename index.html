@@ -123,7 +123,7 @@
           <div class="two-fields"><div><label class="field-label" for="direction">Conversation direction</label><select id="direction"><option value="stay">Stay on topic</option><option value="change">Change topic</option><option value="revive">Revive conversation</option><option value="connection">Build connection</option><option value="flirt_up">Turn up flirting</option><option value="flirt_down">Dial back flirting</option><option value="content">Introduce paid content naturally</option><option value="boundaries">Set boundaries</option></select></div><div><label class="field-label" for="energy">Reply energy</label><select id="energy"><option value="match">Match buyer</option><option value="softer">Softer</option><option value="playful">More playful</option><option value="intense">More intense</option></select></div></div>
           <div class="two-fields"><div><label class="field-label" for="directness">Directness</label><select id="directness"><option value="direct">Get to the point</option><option value="balanced">Balanced</option><option value="anticipation">Build anticipation</option></select></div><div class="emoji-field"><label class="field-label">Emojis</label><label class="checkbox-control"><input type="checkbox" id="emoji"> Allow occasional emoji</label></div></div>
           </details><button type="button" id="confirm-style" class="small-primary" hidden>Confirm settings</button>
-          <div class="passcode-wrap" id="passcode-wrap" hidden><label class="field-label" for="passcode">Server access passcode</label><input type="password" id="passcode" autocomplete="off" placeholder="Enter the private server passcode"><small>Required for live AI; never saved in the app.</small><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></div>
+          <div id="signed-in-wrap" hidden><p class="micro-copy">Signed in on this device.</p><button type="button" id="sign-out" class="subtle-button">Sign out</button></div><div class="passcode-wrap" id="passcode-wrap" hidden><label class="field-label" for="passcode">Server access passcode</label><input type="password" id="passcode" autocomplete="off" placeholder="Enter the private server passcode"><small>Enter once to sign in. Your access code is never saved in the app.</small><label class="checkbox-control"><input type="checkbox" id="remember-device" checked> Remember this device for 30 days</label><button type="button" id="sign-in" class="subtle-button">Sign in</button><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></div>
           <button type="button" class="generate" id="generate"><span id="generate-icon">✦</span><span id="generate-label">Generate 2 replies</span><span class="generate-arrow">↗</span></button>
           <p class="fineprint">A human reviews and sends all replies. Copied replies add <b>#AI</b> disclosure.</p>
         </section>
@@ -466,10 +466,20 @@ async function useFile(file){if(!file)return;try{
     clearResults();refreshIdentity();busy('',false);
     if(state.aiReady)await analyze();
   }catch(e){notice(e.message,true);}}
+async function signIn(){
+ const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify({remember:$('remember-device').checked}),cache:'no-store'});
+ const data=await res.json();if(!res.ok)throw Error(data.error||'Sign in failed.');
+ state.authenticated=true;$('passcode').value='';updateAuth();
+}
+function updateAuth(){
+ $('passcode-wrap').hidden=!state.passcodeRequired||state.authenticated;
+ $('signed-in-wrap').hidden=!state.authenticated;
+}
 async function requestJson(route,body){
+ if(state.passcodeRequired&&!state.authenticated&&$('passcode').value&&$('remember-device').checked)await signIn();
   const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify(body),cache:'no-store'});
   let data;try{data=await res.json();}catch{throw Error('The server returned an unreadable response.');}
-  if(!res.ok)throw Error(data.error||'The request failed.');return data;
+  if(!res.ok){if(res.status===401){state.authenticated=false;updateAuth();}throw Error(data.error||'The request failed.');}return data;
 }
 async function analyze(){
   if(state.loading||!state.image)return;
@@ -604,13 +614,13 @@ function download(name,text){const url=URL.createObjectURL(new Blob([text],{type
 async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
 async function status(){
   if(window.DELILAH_DEMO_ONLY){state.aiReady=false;updateStatus();return;}
-  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
+  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);state.authenticated=Boolean(d.authenticated);if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
   catch{state.aiReady=false;state.passcodeRequired=false;}
   updateStatus();
 }
 function updateStatus(){
   $('status-text').textContent=state.aiReady?'Live AI ready':'Demo only';$('connection-status').classList.toggle('ai',state.aiReady);
-  $('passcode-wrap').hidden=!state.passcodeRequired;
+  updateAuth();
   $('generate-label').textContent=state.aiReady?'Generate 2 AI replies':'Try 2 demo replies';
   if(!state.image)notice(state.aiReady?'Live AI is connected. Uploaded screenshots are analyzed automatically; no automatic FeetFinder access.':'Demo mode: paste text for sample replies. Live screenshot reading needs a server with an OpenAI API key.');
 }
@@ -620,6 +630,8 @@ function renderPrivateReferences(){const list=$('private-reference-list');list.r
  for(const ref of vault.getReferences()){const row=document.createElement('div');row.className='action-row';const label=document.createElement('label');label.className='checkbox-control';const enabled=document.createElement('input');enabled.type='checkbox';enabled.checked=ref.enabled;enabled.addEventListener('change',async()=>{try{await vault.setReferences(vault.getReferences().map(r=>r.id===ref.id?{...r,enabled:enabled.checked}:r));clearResults();}catch(e){notice(e.message,true);renderPrivateReferences();}});label.append(enabled,document.createTextNode(ref.title));const edit=document.createElement('button');edit.className='subtle-button';edit.textContent='Edit';edit.onclick=()=>{editingReference=ref.id;$('reference-title').value=ref.title;$('reference-text').value=ref.text;$('reference-kind').value=ref.kind;};const del=document.createElement('button');del.className='danger-outline';del.textContent='Delete';del.onclick=async()=>{try{await vault.setReferences(vault.getReferences().filter(r=>r.id!==ref.id));if(editingReference===ref.id)clearReferenceEditor();renderPrivateReferences();clearResults();}catch(e){notice(e.message,true);}};row.append(label,edit,del);list.append(row);}
 }
 function bind(){
+ $('sign-in').onclick=async()=>{try{await signIn();toast($('remember-device').checked?'Signed in for 30 days':'Signed in for this browser session');}catch(e){notice(e.message,true);}};
+ $('sign-out').onclick=async()=>{try{const res=await fetch('/api/logout',{method:'POST',cache:'no-store'});if(!res.ok)throw Error('Could not sign out. Try again.');state.authenticated=false;$('passcode').value='';updateAuth();toast('Signed out');}catch(e){notice(e.message,true);}};
  $('check-connection').onclick=async()=>{const button=$('check-connection');button.disabled=true;try{const result=await requestJson('/api/check',{});$('connection-check-result').textContent='AI connection verified · '+result.model+'. '+result.scope;}catch(e){$('connection-check-result').textContent=e.message;}finally{button.disabled=false;}};
 
  $('reference-new').onclick=clearReferenceEditor;

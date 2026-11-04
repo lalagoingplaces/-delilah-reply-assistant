@@ -9,7 +9,7 @@ import {catalog,selectReferences,referenceAudit} from './references.mjs';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname,join} from 'node:path';
-import {timingSafeEqual} from 'node:crypto';
+import {timingSafeEqual,createHmac,randomBytes} from 'node:crypto';
 
 const root=dirname(fileURLToPath(import.meta.url));
 const port=Number(process.env.PORT||8787);
@@ -47,6 +47,18 @@ const analyzeSchema={
 };
 function json(res,status,body){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(body));}
 function secureEquals(a,b){const ba=Buffer.from(a||''),bb=Buffer.from(b||'');return ba.length===bb.length&&timingSafeEqual(ba,bb);}
+const sessionAge=30*24*60*60;
+const sessionCookie='delilah_session';
+function sessionSignature(value){return createHmac('sha256',appPasscode).update('delilah-session-v1:'+value).digest('base64url');}
+function hasSession(req){
+ const token=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(sessionCookie+'='))?.slice(sessionCookie.length+1)||'';
+ const parts=token.split('.');if(parts.length!==3||!strongPasscode)return false;
+ const expires=Number(parts[0]),now=Math.floor(Date.now()/1000);
+ return Number.isSafeInteger(expires)&&expires>now&&expires<=now+sessionAge&&secureEquals(parts[2],sessionSignature(parts[0]+'.'+parts[1]));
+}
+function authorized(req){return hasSession(req)||secureEquals(req.headers['x-delilah-passcode'],appPasscode);}
+function setSessionCookie(res,value,maxAge){res.setHeader('Set-Cookie',`${sessionCookie}=${value}; Path=/; HttpOnly; SameSite=Strict; ${maxAge===undefined?'':'Max-Age='+maxAge+'; '}${publicServer?'Secure':''}`);}
+function sameOrigin(req){if(req.headers['sec-fetch-site']==='cross-site')return false;if(!req.headers.origin)return true;try{return new URL(req.headers.origin).host===req.headers.host;}catch{return false;}}
 async function readJson(req){return await new Promise((resolve,reject)=>{
  let length=0;const parts=[];
  req.on('data',chunk=>{length+=chunk.length;if(length>8_000_000){reject(Object.assign(new Error('Screenshot is too large.'),{code:413}));req.destroy();return;}parts.push(chunk);});
@@ -117,20 +129,31 @@ const manifest={name:'Delilah Reply Assistant',short_name:'Delilah',display:'sta
 export const server=http.createServer(async(req,res)=>{
  try{
   const path=new URL(req.url||'/',`http://${req.headers.host||'localhost'}`).pathname;
+  if(req.method==='POST'&&path.startsWith('/api/')&&!sameOrigin(req))return json(res,403,{error:'Open this app directly to continue.'});
+  if(req.method==='POST'&&path==='/api/login'){
+   if(serverSetupIssue||!strongPasscode)return json(res,503,{error:'Server access is not configured.'});
+   if(!limitRequest(req))return json(res,429,{error:'Too many attempts. Try again shortly.'});
+   if(!secureEquals(req.headers['x-delilah-passcode'],appPasscode))return json(res,401,{error:'Incorrect or missing server access passcode.'});
+   const body=await readJson(req),expires=Math.floor(Date.now()/1000)+sessionAge;
+   const value=expires+'.'+randomBytes(24).toString('base64url');
+   setSessionCookie(res,value+'.'+sessionSignature(value),body.remember===true?sessionAge:undefined);
+   return json(res,200,{authenticated:true});
+  }
+  if(req.method==='POST'&&path==='/api/logout'){setSessionCookie(res,'',0);return json(res,200,{authenticated:false});}
   if(req.method==='GET'&&path==='/api/references'){
    if(serverSetupIssue)return json(res,503,{error:'Server access is not configured.'});
-   if(strongPasscode&&!secureEquals(req.headers['x-delilah-passcode'],appPasscode))return json(res,401,{error:'Enter the server passcode first.'});
+   if(strongPasscode&&!authorized(req))return json(res,401,{error:'Enter the server passcode first.'});
    return json(res,200,{sources:catalog()});
   }
   if(req.method==='GET'&&path==='/health')return json(res,200,{ok:true});
-  if(req.method==='GET'&&path==='/api/status')return json(res,200,{aiReady,passcodeRequired:strongPasscode,serverSetupIssue});
+  if(req.method==='GET'&&path==='/api/status')return json(res,200,{aiReady,passcodeRequired:strongPasscode,authenticated:hasSession(req),serverSetupIssue});
   if(req.method==='GET'&&(path==='/'||path==='/index.html')){const data=await readFile(join(root,'index.html'));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'});return res.end(data);}
   if(req.method==='GET'&&path==='/sw.js'){res.writeHead(200,{'Content-Type':'application/javascript','Cache-Control':'no-store','Service-Worker-Allowed':'/'});return res.end(serviceWorker);}
   if(req.method==='GET'&&path==='/manifest.webmanifest')return json(res,200,manifest);
   if(req.method==='POST'&&(path==='/api/analyze'||path==='/api/generate'||path==='/api/check')){
    if(serverSetupIssue)return json(res,503,{error:'Public hosting requires a strong APP_PASSCODE (at least 12 characters).'});
    if(!aiReady)return json(res,503,{error:'Live AI is not configured. Set OPENAI_API_KEY on the server.'});
-   if(strongPasscode&&!secureEquals(req.headers['x-delilah-passcode'],appPasscode))return json(res,401,{error:'Incorrect or missing server access passcode.'});
+   if(strongPasscode&&!authorized(req))return json(res,401,{error:'Incorrect or missing server access passcode.'});
    if(!limitRequest(req))return json(res,429,{error:'Too many requests. Try again shortly.'});
    const body=await readJson(req);
    if(path==='/api/check'){

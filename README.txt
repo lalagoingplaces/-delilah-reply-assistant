@@ -136,3 +136,6 @@ PERSONAL BUILD UPDATE — NOVEMBER 4, 2026
 Checks: node --test test-references.mjs; node test-vault.mjs;
 node test-workflow.mjs. The workflow test uses a simulated DOM and is not visual
 browser testing. Live API, physical phone and hosted deployment remain untested.
+
+DEVICE SIGN-IN
+Enter the server access code and choose Remember this device to stay signed in for up to 30 days. The server sets a signed HttpOnly, SameSite cookie (Secure on public hosting); the access code is not saved in browser storage. Sign out clears the cookie. Changing APP_PASSCODE invalidates all device sessions. Private-memory encryption still has its own passphrase. Clearing browser data or using private browsing can require signing in again.
