@@ -75,6 +75,7 @@
 
 [hidden]{display:none!important}.login-screen{min-height:100dvh;display:grid;place-items:center;padding:24px}.login-card{width:100%;max-width:420px;border:1px solid var(--edge);border-radius:24px;padding:32px;background:var(--panel);box-shadow:0 22px 55px #0004}.login-card h1{font-size:40px;margin:20px 0 10px}.login-card p{color:var(--muted);font-size:14px;line-height:1.6}.login-card .generate{margin-top:20px}.login-error{color:#ffd5dc!important;min-height:24px}.account-bar{display:flex;align-items:center;gap:14px;justify-content:flex-end;padding:12px 0;color:var(--muted);font-size:12px}
 .hero{padding:26px 4px 22px}.hero h1{font-size:42px;margin:12px 0}.hero-pills{display:none}.app-settings{margin-top:22px}.app-settings>summary{cursor:pointer;font-weight:700;color:var(--pink)}.app-settings .vault-banner{margin-top:20px}.chat-meta{line-height:1.7}.copy-btn{min-height:44px;padding:12px 18px}.results-panel .section-helper{margin-bottom:14px}@media(max-width:570px){.hero{padding:22px 0 18px}.hero h1{font-size:34px}}
+#app-shell{padding-top:env(safe-area-inset-top,0px)}.account-bar{justify-content:space-between;flex-wrap:wrap;padding:14px 0 18px;gap:12px}.account-bar #sign-out{min-height:48px;min-width:104px;padding:12px 20px;touch-action:manipulation}.account-bar #account-label{font-size:13px}.login-screen{padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 </style>
   <title>Delilah Reply Assistant · V4 · Buyer Chats</title>
 </head>
@@ -92,8 +93,9 @@
     </form>
   </section>
   <div class="shell" id="app-shell" hidden>
-    <div class="account-bar"><span id="account-label"></span><button type="button" class="subtle-button" id="sign-out">Sign out</button></div>
+
     <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT</span></span></div><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
+    <div class="account-bar"><span id="account-label"></span><button type="button" class="subtle-button" id="sign-out">Sign out</button></div>
     <main>
       <section class="hero hero-v3"><div class="eyebrow"><span class="eyebrow-line"></span> DELILAH'S VOICE · PRIVATE BY DESIGN</div><h1>Her voice. <em>Every reply.</em></h1><p>Upload a screenshot, review the buyer and style, then get <strong>two ready-to-send replies.</strong></p><div class="hero-pills"><span>♡ Flirty by default</span><span>♧ Encrypted buyer memory</span><span>✧ Review before sending</span></div></section>
       <section class="buyer-chat-panel" id="buyer-chat-panel" aria-labelledby="chat-panel-heading">
