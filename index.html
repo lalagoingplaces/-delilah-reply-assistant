@@ -101,6 +101,7 @@
         <div class="chat-toolbar"><label class="field-label" for="chat-search">Find a buyer</label><input id="chat-search" type="search" placeholder="Search username or Username FF" autocomplete="off" aria-label="Search saved buyer chats"><div class="chat-count" id="chat-count">Unlock memory to browse chats</div></div>
         <div class="chat-list" id="chat-list" aria-live="polite"><p class="chat-empty">Unlock private memory above to see buyer conversations.</p></div>
         <p class="chat-helper">New usernames automatically create a chat only when screenshot analysis is confident and memory is unlocked. Unclear usernames require confirmation. Screenshots aren't saved; saved buyer messages and notes are encrypted on this device.</p>
+        <details id="saved-conversation" hidden><summary id="saved-conversation-title">Saved conversation</summary><p class="micro-copy">Chat text saves automatically for the confirmed buyer. Only replies you mark sent are recorded as sent.</p><div id="saved-conversation-entries"></div><button type="button" id="delete-open-buyer" class="danger-outline">Delete this buyer and conversation</button></details>
       </section>
       <div class="workspace workspace-v3">
         <section class="panel compose-panel" aria-labelledby="compose-title">
@@ -256,7 +257,7 @@ class EncryptedVault {
   constructor(storage) {let target=storage; if(!target){try{target=window.localStorage;}catch{target=null;}}this.storage=target||{getItem:()=>null,setItem:()=>{throw new Error('Browser storage is unavailable. Use the hosted HTTPS app.');},removeItem:()=>{}};this.key=null;this.salt=null;this.data=null;this.queue=Promise.resolve();}
   get exists(){return Boolean(this.storage.getItem(STORAGE_KEY));}
   get unlocked(){return Boolean(this.key&&this.data);}
-  list(){return this.unlocked?this.data.buyers.map(b=>({username:b.username,displayName:b.displayName||b.username,count:b.events.length,incoming:b.events.filter(e=>e.kind==='incoming').length,sent:b.events.filter(e=>e.kind==='sent').length,lastActivity:b.events.reduce((latest,e)=>Math.max(latest,Number(e.time)||0),0),updated:b.updated})).sort((a,b)=>b.updated-a.updated):[];}
+  list(){return this.unlocked?this.data.buyers.map(b=>({username:b.username,displayName:b.displayName||b.username,personality:b.settings?.personality||'flirty',smartSelect:b.settings?.smartSelect!==false,count:b.events.length,incoming:b.events.filter(e=>e.kind==='incoming').length,sent:b.events.filter(e=>e.kind==='sent').length,lastActivity:b.events.reduce((latest,e)=>Math.max(latest,Number(e.time)||0),0),updated:b.updated})).sort((a,b)=>b.updated-a.updated):[];}
   getBuyer(username){const key=safeHandle(username);if(!this.unlocked||!key)return null;const b=this.data.buyers.find(x=>x.username===key);return b?structuredClone(b):null;}
   getReferences(){return this.unlocked?structuredClone(this.data.references||[]):[];}
   async setReferences(refs){if(!Array.isArray(refs)||refs.length>20)throw Error('Maximum 20 private references.');if(refs.filter(r=>r.enabled&&['voice','offerings'].includes(r.kind)).length>4)throw Error('Enable up to four voice/offerings references. Use guidance for additional documents.');await this.update(d=>{d.references=refs;});}
@@ -332,6 +333,7 @@ class EncryptedVault {
   }
   async setBuyerNotes(username,notes){const key=safeHandle(username);await this.update(d=>{const b=d.buyers.find(x=>x.username===key);if(!b)throw Error('Buyer not selected.');b.notes=String(notes||'').slice(0,1000);b.updated=Date.now();});}
   async setPlaybook(value){await this.update(d=>{d.playbook=String(value||'').slice(0,2000);});}
+  async removeEvent(username,index){await this.update(d=>{const b=d.buyers.find(x=>x.username===safeHandle(username));if(!b||!Number.isInteger(index)||index<0||index>=b.events.length)throw Error('Saved entry not found.');b.events.splice(index,1);});}
   async removeBuyer(username){const key=safeHandle(username);await this.update(d=>{d.buyers=d.buyers.filter(b=>b.username!==key);});}
   async eraseAll(){this.lock();this.storage.removeItem(STORAGE_KEY);}
   exportEncrypted(){if(!this.exists)throw new Error('No encrypted memory to export.');return this.storage.getItem(STORAGE_KEY);}
@@ -369,7 +371,7 @@ let toastTimer;
 function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2500);}
 function notice(message,error=false){const element=$('notice');element.hidden=!message;element.textContent=message||'';element.className='notice'+(error?' error':'');}
 function values(){return {...cleanSettings({...state,length:$('length').value,objective:$('objective').value,direction:$('direction').value,energy:$('energy').value,directness:$('directness').value,emoji:$('emoji').checked,smartSelect:$('smart-select').checked,profanity:$('profanity').value}),customStyle:$('custom-style').value.trim()};}
-function savePrefs(){const p=values();try{localStorage.setItem('delilah-v3-prefs',JSON.stringify(p));}catch{}}
+function savePrefs(){const p=values();try{localStorage.setItem('delilah-v3-prefs',JSON.stringify(p));}catch{}if(vault.unlocked&&state.activeBuyer&&!state.oneoff&&!state.identityPending){vault.setBuyerSettings(state.activeBuyer,p).then(renderBuyerChats).catch(e=>notice(e.message,true));}}
 function choose(group,value){if(!VALID[group]||!VALID[group].includes(value))return;state[group]=value;document.querySelectorAll(`[data-group="${group}"]`).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.value===value)));
   if(group==='personality'){$('persona-description').textContent=descriptions[value];}savePrefs();}
 function loadPrefs(){let pref={};try{pref=JSON.parse(localStorage.getItem('delilah-v3-prefs')||'{}');}catch{}
@@ -402,7 +404,7 @@ function renderBuyerChats(){
     const avatar=document.createElement('span');avatar.className='chat-avatar';avatar.textContent=(b.displayName||'?').slice(0,1).toUpperCase();
     const details=document.createElement('span');details.className='chat-details';
     const title=document.createElement('span');title.className='chat-title';title.textContent=`${b.displayName} FF`;
-    const meta=document.createElement('span');meta.className='chat-meta';meta.textContent=`${b.incoming} saved chat entries · ${b.sent} replies marked sent · ${b.lastActivity?'Last activity '+new Date(b.lastActivity).toLocaleDateString():'No messages yet'}`;meta.title='Counts cover saved entries in this app. A screenshot excerpt may contain several messages. Replies count only when marked sent. Recent history keeps up to 80 entries per buyer.';
+    const meta=document.createElement('span');meta.className='chat-meta';meta.textContent=`${b.personality}${b.smartSelect?' + Smart Select':''} · ${b.incoming} saved chat entries · ${b.sent} replies marked sent · ${b.lastActivity?'Last activity '+new Date(b.lastActivity).toLocaleDateString():'No messages yet'}`;meta.title='Counts cover saved entries in this app. A screenshot excerpt may contain several messages. Replies count only when marked sent. Recent history keeps up to 80 entries per buyer.';
     details.append(title,meta);button.append(avatar,details);button.addEventListener('click',()=>openSavedBuyer(b.displayName));list.append(button);
   }
 }
@@ -447,7 +449,18 @@ function refreshVault(){
   }
   const buyer=unlocked&&!state.oneoff? vault.getBuyer(chosen):null;
   $('buyer-notes').value=buyer?.notes||'';
-  refreshIdentity();renderBuyerChats();
+  refreshIdentity();renderBuyerChats();renderSavedConversation();
+}
+function renderSavedConversation(){
+ const buyer=vault.unlocked&&state.activeBuyer&&!state.oneoff?vault.getBuyer(state.activeBuyer):null;
+ $('saved-conversation').hidden=!buyer;const list=$('saved-conversation-entries');list.replaceChildren();if(!buyer)return;
+ $('saved-conversation-title').textContent=buyer.displayName+' FF · saved conversation';
+ buyer.events.forEach((event,index)=>{const row=document.createElement('div');row.className='result-card';const title=document.createElement('b');title.textContent=(event.kind==='sent'?'Delilah · marked sent':'Buyer · saved chat')+' · '+new Date(event.time).toLocaleString();const text=document.createElement('p');text.style.whiteSpace='pre-wrap';text.textContent=event.content;const button=document.createElement('button');button.type='button';button.className='danger-outline';button.textContent='Delete this entry';button.onclick=async()=>{if(!confirm('Delete this saved entry? This cannot be undone without a backup.'))return;try{await vault.removeEvent(buyer.username,index);clearResults();refreshVault();}catch(e){notice(e.message,true);}};row.append(title,text,button);list.append(row);});
+}
+async function autosaveBuyerMessage(){
+ if(!vault.unlocked||!state.activeBuyer||state.oneoff||state.identityPending||!$('save-incoming').checked)return;
+ const text=state.analysis?.conversation_excerpt||$('message').value.trim();if(!text)return;
+ try{await vault.addIncoming(state.activeBuyer,text,state.analysis?'screenshot':'chat');renderBuyerChats();renderSavedConversation();}catch(e){notice(e.message,true);}
 }
 function openSavedBuyer(username){
   const to=normalizeUsername(username),visible=normalizeUsername(state.analysis?.buyer_username);
@@ -463,9 +476,9 @@ async function activateBuyer(username,byManual=false){
     const previous=state.activeBuyer&&!state.oneoff?state.activeBuyer:null;state.requestVersion++;
     const existing=vault.unlocked&&Boolean(vault.getBuyer(key));
     const saved=vault.unlocked?vault.getBuyer(key)?.settings:null;applySettings(saved||DEFAULTS);if(state.image)resetStyleChoice();
-    if(vault.unlocked)await vault.ensureBuyer(username);
+    if(vault.unlocked){await vault.ensureBuyer(username);if(!saved)await vault.setBuyerSettings(username,values());}
     state.activeBuyer=key;state.oneoff=false;state.pendingBuyer=null;state.pendingDisplay=null;state.identityPending=false;state.identityOverride=byManual||Boolean(state.analysis&&(state.analysis.identity_status!=='clear'||state.analysis.confidence!=='high'));
-    clearResults();refreshVault();$('manual-username').value='';
+    if(byManual||(state.analysis&&normalizeUsername(state.analysis.buyer_username)===key))await autosaveBuyerMessage();clearResults();refreshVault();$('manual-username').value='';
     if(previous&&previous!==key)showSwitchAlert(`Buyer changed: ${buyerName(previous)} FF → ${chatTitle(key)}. Separate buyer history ${existing?'reopened':'created'}.`);
     else showSwitchAlert(existing?`Opened ${chatTitle(key)} — existing buyer conversation.`:`${chatTitle(key)} — ${vault.unlocked?'new encrypted buyer chat created':'selected; unlock memory to save this buyer chat'}.`);
     toast(`${chatTitle(key)} · ${existing?'returning buyer':'new buyer'}`);
@@ -689,6 +702,9 @@ function renderPrivateReferences(){const list=$('private-reference-list');list.r
  for(const ref of vault.getReferences()){const row=document.createElement('div');row.className='action-row';const label=document.createElement('label');label.className='checkbox-control';const enabled=document.createElement('input');enabled.type='checkbox';enabled.checked=ref.enabled;enabled.addEventListener('change',async()=>{try{await vault.setReferences(vault.getReferences().map(r=>r.id===ref.id?{...r,enabled:enabled.checked}:r));clearResults();}catch(e){notice(e.message,true);renderPrivateReferences();}});label.append(enabled,document.createTextNode(ref.title));const edit=document.createElement('button');edit.className='subtle-button';edit.textContent='Edit';edit.onclick=()=>{editingReference=ref.id;$('reference-title').value=ref.title;$('reference-text').value=ref.text;$('reference-kind').value=ref.kind;};const del=document.createElement('button');del.className='danger-outline';del.textContent='Delete';del.onclick=async()=>{try{await vault.setReferences(vault.getReferences().filter(r=>r.id!==ref.id));if(editingReference===ref.id)clearReferenceEditor();renderPrivateReferences();clearResults();}catch(e){notice(e.message,true);}};row.append(label,edit,del);list.append(row);}
 }
 function bind(){
+ $('delete-open-buyer').onclick=()=>$('delete-buyer').click();
+ let autosaveTimer; $('message').addEventListener('input',()=>{clearTimeout(autosaveTimer);autosaveTimer=setTimeout(autosaveBuyerMessage,700);});$('message').addEventListener('blur',autosaveBuyerMessage);
+
  $('backup-locked-memory').onclick=()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup downloaded');}catch(e){notice(e.message,true);}};
  $('reset-locked-memory').onclick=async()=>{if(!confirm('Reset private memory on this device? This permanently deletes ALL saved buyer chats, settings, notes, creator playbook and personal references in this browser. An encrypted backup still requires your OLD passphrase. Your app sign-in and built-in references are not reset.'))return;try{state.requestVersion++;await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;$('vault-password').value='';clearResults();refreshVault();notice('Private memory reset. Choose a new passphrase of at least 10 characters and tap Create private memory.');$('vault-password').focus();}catch(e){notice(e.message,true);}};
  $('login-form').addEventListener('submit',async e=>{e.preventDefault();const button=$('login-submit');button.disabled=true;$('login-error').textContent='Signing in…';try{await signIn();$('login-error').textContent='';}catch(error){$('login-error').textContent=error.message;}finally{button.disabled=false;}});
@@ -704,6 +720,7 @@ function bind(){
  $('confirm-style').addEventListener('click',()=>{state.styleConfirmed=true;$('confirm-style').hidden=true;$('style-status').textContent='Updated settings confirmed for this screenshot.';});
 
   document.querySelectorAll('[data-group="personality"],[data-group="intensity"]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.group,b.dataset.value)));
+  $('custom-style').addEventListener('change',savePrefs);
   ['length','objective','direction','energy','directness','emoji','profanity','smart-select'].forEach(id=>$(id).addEventListener('change',savePrefs));
   $('vault-auth-button').addEventListener('click',vaultAuth);
   $('vault-password').addEventListener('keydown',e=>{if(e.key==='Enter')vaultAuth();});

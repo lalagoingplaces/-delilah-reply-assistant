@@ -49,3 +49,8 @@ console.log('PASS: REAL AES-GCM vault encryption, isolation, persistence, wrong-
 const stats=e.list();
 for(const buyer of stats){assert.equal(buyer.count,buyer.incoming+buyer.sent);assert(buyer.lastActivity>=0);}
 console.log("PASS: buyer saved-entry and sent-reply counts match stored activity.");
+
+await e.eraseAll();await e.create('test-delete-password');await e.ensureBuyer('DeleteBuyer');await e.ensureBuyer('KeepBuyer');
+await e.addIncoming('DeleteBuyer','Delete just this entry');await e.addIncoming('DeleteBuyer','Keep this second entry');await e.addIncoming('KeepBuyer','Keep other buyer');
+await e.removeEvent('DeleteBuyer',0);assert.equal(e.getBuyer('DeleteBuyer').events.length,1);assert.equal(e.getBuyer('DeleteBuyer').events[0].content,'Keep this second entry');assert.equal(e.getBuyer('KeepBuyer').events[0].content,'Keep other buyer');
+console.log('PASS: deleting one saved entry preserves remaining history and other buyers.');
