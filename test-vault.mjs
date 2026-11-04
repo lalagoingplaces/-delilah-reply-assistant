@@ -54,3 +54,8 @@ await e.eraseAll();await e.create('test-delete-password');await e.ensureBuyer('D
 await e.addIncoming('DeleteBuyer','Delete just this entry');await e.addIncoming('DeleteBuyer','Keep this second entry');await e.addIncoming('KeepBuyer','Keep other buyer');
 await e.removeEvent('DeleteBuyer',0);assert.equal(e.getBuyer('DeleteBuyer').events.length,1);assert.equal(e.getBuyer('DeleteBuyer').events[0].content,'Keep this second entry');assert.equal(e.getBuyer('KeepBuyer').events[0].content,'Keep other buyer');
 console.log('PASS: deleting one saved entry preserves remaining history and other buyers.');
+
+const DeviceMemory=vm.runInContext('DeviceMemory',ctx);const device=new DeviceMemory(localStorage);assert(device.unlocked);
+await device.ensureBuyer('DeviceBuyer');await device.addIncoming('DeviceBuyer','Saved without password');const reopened=new DeviceMemory(localStorage);assert.equal(reopened.getBuyer('DeviceBuyer').events.length,1);
+reopened.lock();assert(!new DeviceMemory(localStorage).unlocked);await reopened.unlock();assert.equal(reopened.getBuyer('DeviceBuyer').events.length,1);
+console.log('PASS: password-free device memory persists across instances and off/on without deleting history.');

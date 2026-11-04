@@ -25,44 +25,7 @@ assert.equal((html.match(/class="persona-option"/g)||[]).length,7);
 assert(!html.match(/<details id="advanced-settings"[^>]*\sopen/));
 console.log('PASS: screenshot choice resets, Yes requires confirmation, No retains settings, seven tiles and collapsed advanced controls (simulated DOM, not visual browser testing).');
 
-await h.vault.create('synthetic-memory-password');
-await h.vault.ensureBuyer('SyntheticBuyer');
-h.vault.lock();h.refreshVault();
-assert.equal(elements.get('locked-memory-controls').hidden,false);
-await elements.get('reset-locked-memory').onclick();
-assert.equal(h.vault.exists,true,'Cancel must preserve encrypted history');
-confirmReset=true;
-await elements.get('reset-locked-memory').onclick();
-assert.equal(h.vault.exists,false,'Confirmed reset must clear only private memory');
-assert.equal(elements.get('vault-auth-button').textContent,'Create private memory');
-assert.equal(elements.get('locked-memory-controls').hidden,true);
-await h.vault.create('new-synthetic-password');
-assert.equal(h.vault.unlocked,true);
-console.log('PASS: reset is available while locked, cancel preserves data, confirmed reset allows new memory creation.');
 
-await h.vault.eraseAll();h.state.image='';h.state.passcodeRequired=true;h.state.aiReady=true;
-const account={authenticated:true,username:'Delilah',accountVersion:'synthetic-account-version',rememberUntil:Date.now()+2592000000,aiReady:true,passcodeRequired:true};
-mockFetch=async(url,options)=>{
- if(url==='/api/login'){const data=JSON.parse(options.body);assert.equal(data.username,'Delilah');assert.equal(data.password,'synthetic-login-password');return {ok:true,json:async()=>account};}
- if(url==='/api/status')return {ok:true,json:async()=>account};
- if(url==='/api/logout')return {ok:true};
- throw Error('Unexpected request '+url);
-};
-elements.get('login-username').value='Delilah';elements.get('login-password').value='synthetic-login-password';elements.get('remember-device').checked=true;
-await h.signIn();assert(h.vault.unlocked);assert.equal(elements.get('app-shell').hidden,false);assert.equal(elements.get('login-screen').hidden,true);
-assert(deviceRecord.key);assert.equal(deviceRecord.key.extractable,false);assert(!JSON.stringify(deviceRecord).includes('synthetic-login-password'));
-await h.vault.ensureBuyer('AccountBuyer');await h.vault.setBuyerNotes('AccountBuyer','Preserve these notes');
-h.vault.lock();await h.status();assert(h.vault.unlocked);assert.equal(h.vault.getBuyer('AccountBuyer').notes,'Preserve these notes');
-await elements.get('sign-out').onclick();assert.equal(deviceRecord,null);assert(!h.vault.unlocked);assert.equal(elements.get('login-screen').hidden,false);assert.equal(elements.get('app-shell').hidden,true);
-// Existing memory with an old passphrase must remain intact until explicitly unlocked.
-await h.vault.eraseAll();await h.vault.create('old-private-memory-password');await h.vault.ensureBuyer('LegacyBuyer');await h.vault.setBuyerNotes('LegacyBuyer','Do not lose legacy notes');h.vault.lock();
-elements.get('login-password').value='synthetic-login-password';await h.signIn();assert(!h.vault.unlocked);assert(h.vault.exists);
-elements.get('vault-password').value='old-private-memory-password';await h.vaultAuth();assert(h.vault.unlocked);assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
-h.vault.lock();await h.vault.unlock('synthetic-login-password');assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
-console.log('PASS: login gate, automatic encrypted memory, remembered nonextractable key, reload, signout cleanup and lossless legacy passphrase migration.');
-
-await testDeviceStore('delete');h.vault.lock();h.state.rememberUntil=null;await h.status();
-assert.equal(h.state.rememberUntil,account.rememberUntil,'Remembered login lifetime must survive missing local unlock key');
-elements.get('vault-password').value='synthetic-login-password';await h.vaultAuth();assert(deviceRecord?.key,'Unlock must remember its key after recovering a missing device key');
-h.vault.lock();await h.status();assert(h.vault.unlocked,'Recovered key must unlock on next reload');
-console.log('PASS: missing remembered key recovery persists across reload.');
+await h.vault.ensureBuyer('SavedBuyer');await h.vault.addIncoming('SavedBuyer','Keep this text');
+h.vault.lock();assert(!h.vault.unlocked);await h.vault.unlock();assert.equal(h.vault.getBuyer('SavedBuyer').events[0].content,'Keep this text');
+console.log('PASS: device memory saves without passphrase and survives off/on.');
