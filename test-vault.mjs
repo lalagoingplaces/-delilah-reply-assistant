@@ -45,3 +45,7 @@ await other.setReferences([]);assert.equal(other.getReferences().length,0);
 await other.removeBuyer('julianr9423');
 assert.equal(other.list().length,1);
 console.log('PASS: REAL AES-GCM vault encryption, isolation, persistence, wrong-password rejection, deletion and preserved username casing');
+
+const stats=e.list();
+for(const buyer of stats){assert.equal(buyer.count,buyer.incoming+buyer.sent);assert(buyer.lastActivity>=0);}
+console.log("PASS: buyer saved-entry and sent-reply counts match stored activity.");
