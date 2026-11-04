@@ -4,13 +4,17 @@ import {webcrypto} from 'node:crypto';
 import assert from 'node:assert/strict';
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
 const ids=new Set([...html.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));
-const elements=new Map([...ids].map(id=>[id,{value:'',checked:false,hidden:false,handlers:{},classList:{add(){},remove(){}},addEventListener(n,f){this.handlers[n]=f;},setAttribute(){},replaceChildren(){},append(){},scrollIntoView(){},focus(){}}]));
+const elements=new Map([...ids].map(id=>[id,{value:'',checked:false,hidden:false,handlers:{},classList:{add(){},remove(){},toggle(){}},addEventListener(n,f){this.handlers[n]=f;},setAttribute(){},removeAttribute(){},replaceChildren(){},append(){},scrollIntoView(){},focus(){}}]));
 const doc={getElementById(id){assert(ids.has(id),'Missing control '+id);return elements.get(id);},querySelectorAll(){return [];},addEventListener(){},createElement(){return {append(){},addEventListener(){}};}};
 const storage=new Map();const localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)};
 let script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
-script=script.replace('loadPrefs();refreshVault();bind();status();','window.hooks={state,values,applySettings,resetStyleChoice,bind,vault,refreshVault};');
-let confirmReset=false;const window={localStorage};
-vm.runInNewContext(script,{window,document:doc,location:{protocol:'http:'},navigator:{},localStorage,confirm:()=>confirmReset,crypto:webcrypto,TextEncoder,TextDecoder,Uint8Array,ArrayBuffer,atob,btoa,structuredClone,console,setTimeout,clearTimeout});
+script=script.replace('loadPrefs();refreshVault();bind();status();','window.hooks={state,values,applySettings,resetStyleChoice,bind,vault,refreshVault,signIn,status,vaultAuth,updateAuth};');
+let deviceRecord=null;
+const testDeviceStore=async(action,value)=>{if(action==='put')deviceRecord=structuredClone(value);else if(action==='delete')deviceRecord=null;return deviceRecord;};
+let confirmReset=false;const window={localStorage,testDeviceStore};
+let mockFetch;
+script=script.replace('(() => {','deviceUnlockStore=window.testDeviceStore;\n(() => {');
+vm.runInNewContext(script,{window,document:doc,location:{protocol:'http:'},navigator:{},localStorage,fetch:(...args)=>mockFetch(...args),confirm:()=>confirmReset,crypto:webcrypto,TextEncoder,TextDecoder,Uint8Array,ArrayBuffer,atob,btoa,structuredClone,console,setTimeout,clearTimeout});
 const h=window.hooks;h.applySettings({personality:'spicy',smartSelect:true,profanity:'strong'});h.bind();
 h.state.image='repeat-screenshot';h.resetStyleChoice();assert.equal(h.state.styleConfirmed,false);
 elements.get('style-no').handlers.click();assert.equal(h.state.styleConfirmed,true);assert.equal(h.values().personality,'spicy');
@@ -35,3 +39,24 @@ assert.equal(elements.get('locked-memory-controls').hidden,true);
 await h.vault.create('new-synthetic-password');
 assert.equal(h.vault.unlocked,true);
 console.log('PASS: reset is available while locked, cancel preserves data, confirmed reset allows new memory creation.');
+
+await h.vault.eraseAll();h.state.image='';h.state.passcodeRequired=true;h.state.aiReady=true;
+const account={authenticated:true,username:'Delilah',accountVersion:'synthetic-account-version',rememberUntil:Date.now()+2592000000,aiReady:true,passcodeRequired:true};
+mockFetch=async(url,options)=>{
+ if(url==='/api/login'){const data=JSON.parse(options.body);assert.equal(data.username,'Delilah');assert.equal(data.password,'synthetic-login-password');return {ok:true,json:async()=>account};}
+ if(url==='/api/status')return {ok:true,json:async()=>account};
+ if(url==='/api/logout')return {ok:true};
+ throw Error('Unexpected request '+url);
+};
+elements.get('login-username').value='Delilah';elements.get('login-password').value='synthetic-login-password';elements.get('remember-device').checked=true;
+await h.signIn();assert(h.vault.unlocked);assert.equal(elements.get('app-shell').hidden,false);assert.equal(elements.get('login-screen').hidden,true);
+assert(deviceRecord.key);assert.equal(deviceRecord.key.extractable,false);assert(!JSON.stringify(deviceRecord).includes('synthetic-login-password'));
+await h.vault.ensureBuyer('AccountBuyer');await h.vault.setBuyerNotes('AccountBuyer','Preserve these notes');
+h.vault.lock();await h.status();assert(h.vault.unlocked);assert.equal(h.vault.getBuyer('AccountBuyer').notes,'Preserve these notes');
+await elements.get('sign-out').onclick();assert.equal(deviceRecord,null);assert(!h.vault.unlocked);assert.equal(elements.get('login-screen').hidden,false);assert.equal(elements.get('app-shell').hidden,true);
+// Existing memory with an old passphrase must remain intact until explicitly unlocked.
+await h.vault.eraseAll();await h.vault.create('old-private-memory-password');await h.vault.ensureBuyer('LegacyBuyer');await h.vault.setBuyerNotes('LegacyBuyer','Do not lose legacy notes');h.vault.lock();
+elements.get('login-password').value='synthetic-login-password';await h.signIn();assert(!h.vault.unlocked);assert(h.vault.exists);
+elements.get('vault-password').value='old-private-memory-password';await h.vaultAuth();assert(h.vault.unlocked);assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
+h.vault.lock();await h.vault.unlock('synthetic-login-password');assert.equal(h.vault.getBuyer('LegacyBuyer').notes,'Do not lose legacy notes');
+console.log('PASS: login gate, automatic encrypted memory, remembered nonextractable key, reload, signout cleanup and lossless legacy passphrase migration.');

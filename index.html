@@ -72,12 +72,26 @@
 @media(max-width:850px){.chat-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.buyer-chat-panel{padding:19px 15px}.chat-list{grid-template-columns:1fr;max-height:260px}.chat-toolbar input{max-width:none}.chat-count{width:100%;margin-left:0}}
 .persona-option[aria-pressed=true]{outline:2px solid var(--pink)}.persona-option[aria-pressed=true] b::after{content:' ✓'}#private-reference-list .action-row{flex-wrap:wrap}#private-reference-list label{overflow-wrap:anywhere;max-width:100%}input[type=file]{max-width:100%}
+
+[hidden]{display:none!important}.login-screen{min-height:100dvh;display:grid;place-items:center;padding:24px}.login-card{width:100%;max-width:420px;border:1px solid var(--edge);border-radius:24px;padding:32px;background:var(--panel);box-shadow:0 22px 55px #0004}.login-card h1{font-size:40px;margin:20px 0 10px}.login-card p{color:var(--muted);font-size:14px;line-height:1.6}.login-card .generate{margin-top:20px}.login-error{color:#ffd5dc!important;min-height:24px}.account-bar{display:flex;align-items:center;gap:14px;justify-content:flex-end;padding:12px 0;color:var(--muted);font-size:12px}
 </style>
   <title>Delilah Reply Assistant · V4 · Buyer Chats</title>
 </head>
 <body>
   <div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
-  <div class="shell">
+  <section class="login-screen" id="login-screen" aria-labelledby="login-title">
+    <form class="login-card" id="login-form">
+      <div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah</span></div>
+      <h1 id="login-title">Welcome back.</h1><p>Sign in to your reply assistant.</p>
+      <label class="field-label" for="login-username">Username</label><input type="text" id="login-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label class="field-label" for="login-password">Password</label><input type="password" id="login-password" name="password" autocomplete="current-password" required>
+      <label class="checkbox-control" style="margin-top:18px"><input type="checkbox" id="remember-device" checked> Remember me on this device</label>
+      <p class="micro-copy">Stay signed in when you close and reopen the app. Sign out when using a shared device.</p>
+      <button class="generate" id="login-submit" type="submit">Sign in</button><p class="login-error" id="login-error" role="status">Checking sign-in…</p>
+    </form>
+  </section>
+  <div class="shell" id="app-shell" hidden>
+    <div class="account-bar"><span id="account-label"></span><button type="button" class="subtle-button" id="sign-out">Sign out</button></div>
     <header class="topbar"><div class="brand"><span class="brandmark">D<span class="brand-spark">✦</span></span><span class="brandname">Delilah<span class="brand-sub">REPLY ASSISTANT · V3</span></span></div><div class="status" id="connection-status"><span class="status-dot"></span><span id="status-text">Checking…</span></div></header>
     <main>
       <section class="hero hero-v3"><div class="eyebrow"><span class="eyebrow-line"></span> DELILAH'S VOICE · PRIVATE BY DESIGN</div><h1>Her voice. <em>Every reply.</em></h1><p>Upload a conversation screenshot, confirm the buyer, and get <strong>two smart, natural replies</strong> without mixing conversations.</p><div class="hero-pills"><span>♡ Flirty by default</span><span>♧ Encrypted buyer memory</span><span>✧ Review before sending</span></div></section>
@@ -123,7 +137,7 @@
           <div class="two-fields"><div><label class="field-label" for="direction">Conversation direction</label><select id="direction"><option value="stay">Stay on topic</option><option value="change">Change topic</option><option value="revive">Revive conversation</option><option value="connection">Build connection</option><option value="flirt_up">Turn up flirting</option><option value="flirt_down">Dial back flirting</option><option value="content">Introduce paid content naturally</option><option value="boundaries">Set boundaries</option></select></div><div><label class="field-label" for="energy">Reply energy</label><select id="energy"><option value="match">Match buyer</option><option value="softer">Softer</option><option value="playful">More playful</option><option value="intense">More intense</option></select></div></div>
           <div class="two-fields"><div><label class="field-label" for="directness">Directness</label><select id="directness"><option value="direct">Get to the point</option><option value="balanced">Balanced</option><option value="anticipation">Build anticipation</option></select></div><div class="emoji-field"><label class="field-label">Emojis</label><label class="checkbox-control"><input type="checkbox" id="emoji"> Allow occasional emoji</label></div></div>
           </details><button type="button" id="confirm-style" class="small-primary" hidden>Confirm settings</button>
-          <div id="signed-in-wrap" hidden><p class="micro-copy">Signed in on this device.</p><button type="button" id="sign-out" class="subtle-button">Sign out</button></div><div class="passcode-wrap" id="passcode-wrap" hidden><label class="field-label" for="passcode">Server access passcode</label><input type="password" id="passcode" autocomplete="off" placeholder="Enter the private server passcode"><small>Enter once to sign in. Your access code is never saved in the app.</small><label class="checkbox-control"><input type="checkbox" id="remember-device" checked> Remember this device for 30 days</label><button type="button" id="sign-in" class="subtle-button">Sign in</button><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></div>
+          <div id="passcode-wrap" hidden><input id="passcode" type="password" autocomplete="off" hidden></div><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p>
           <button type="button" class="generate" id="generate"><span id="generate-icon">✦</span><span id="generate-label">Generate 2 replies</span><span class="generate-arrow">↗</span></button>
           <p class="fineprint">A human reviews and sends all replies. Copied replies add <b>#AI</b> disclosure.</p>
         </section>
@@ -266,6 +280,19 @@ class EncryptedVault {
       this.key=key;this.salt=salt;this.data=data;
     }catch{this.lock();throw new Error('Could not unlock. Check your passphrase or backup.');}
   }
+  async changePassphrase(passphrase){
+    if(!this.unlocked)throw Error('Unlock existing memory first.');
+    const previousKey=this.key,previousSalt=this.salt;
+    const salt=crypto.getRandomValues(new Uint8Array(16)),key=await this.derive(passphrase,salt);
+    this.key=key;this.salt=salt;try{await this.save();}catch(error){this.key=previousKey;this.salt=previousSalt;throw error;}
+  }
+  async resume(key,salt){
+    const saved=this.parseStored();if(!saved||saved.salt!==salt)throw Error('Saved unlock does not match this memory.');
+    try{const plaintext=await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(saved.iv)},key,base64ToBytes(saved.ciphertext));
+      const data=JSON.parse(decoder.decode(plaintext));if(data.version!==1||!Array.isArray(data.buyers)||typeof data.playbook!=='string')throw Error('Invalid memory');
+      this.key=key;this.salt=base64ToBytes(salt);this.data=data;
+    }catch{this.lock();throw Error('Sign in again to unlock private memory.');}
+  }
   lock(){this.key=null;this.salt=null;this.data=null;}
   parseStored(){try{const blob=JSON.parse(this.storage.getItem(STORAGE_KEY)||'null');return blob&&blob.version===1&&blob.salt&&blob.iv&&blob.ciphertext?blob:null;}catch{return null;}}
   async save(){
@@ -312,6 +339,14 @@ class EncryptedVault {
     if(data?.version!==1||data.kdf!=='PBKDF2-SHA256'||data.iterations!==ITERATIONS||!['salt','iv','ciphertext'].every(k=>typeof data[k]==='string'&&data[k].length>10)||serialized.length>3_500_000)throw new Error('Backup format is invalid.');
     this.lock();this.storage.setItem(STORAGE_KEY,JSON.stringify(data));
   }
+}
+
+async function deviceUnlockStore(action,value){
+ if(!globalThis.indexedDB){if(action==='put')throw Error('Remembered memory is unavailable in this browser.');return null;}
+ const db=await new Promise((resolve,reject)=>{const req=indexedDB.open('delilah-device-unlock',1);req.onupgradeneeded=()=>req.result.createObjectStore('keys');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(Error('Could not open device storage.'));});
+ try{return await new Promise((resolve,reject)=>{const tx=db.transaction('keys',action==='get'?'readonly':'readwrite'),store=tx.objectStore('keys');let result=null;
+ const req=action==='get'?store.get('current'):action==='put'?store.put(value,'current'):store.delete('current');
+ req.onsuccess=()=>{result=req.result;};tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(Error('Could not save device sign-in.'));tx.onabort=()=>reject(Error('Device sign-in was not saved.'));});}finally{db.close();}
 }
 
 
@@ -398,7 +433,7 @@ function refreshVault(){
   $('locked-memory-controls').hidden=!has||unlocked;
   $('vault-locked').hidden=unlocked;$('vault-unlocked').hidden=!unlocked;
   $('vault-auth-button').textContent=has?'Unlock private memory':'Create private memory';
-  $('vault-auth-help').textContent=has?'Enter your passphrase to unlock. It is never uploaded or stored. If you lose it, stored histories cannot be recovered.':'Use at least 10 characters. Your passphrase cannot be recovered, so keep it somewhere safe.';
+  $('vault-auth-help').textContent=state.authenticated?(pendingMemoryPassword?'Enter the OLD private-memory passphrase once to preserve and connect your saved chats.':'Your login password unlocks private memory. Remember me also remembers the unlock on this device.'):has?'Enter your passphrase to unlock. It is never uploaded or stored. If you lose it, stored histories cannot be recovered.':'Use at least 10 characters. Your passphrase cannot be recovered, so keep it somewhere safe.';
   $('vault-state').textContent=unlocked?`Encrypted memory unlocked on this device · ${vault.list().length} buyer profile(s).`:has?'Memory locked. You can use one-off replies without unlocking.':'Create encrypted memory to preserve separate buyer histories, or use one-off mode.';
   const select=$('buyer-select'),chosen=state.activeBuyer;
   select.replaceChildren();const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Choose a saved buyer…';select.append(placeholder);
@@ -467,20 +502,38 @@ async function useFile(file){if(!file)return;try{
     clearResults();refreshIdentity();busy('',false);
     if(state.aiReady)await analyze();
   }catch(e){notice(e.message,true);}}
+let pendingMemoryPassword=null;
+async function rememberMemory(){
+ if(!vault.unlocked)return;
+ if(!state.rememberUntil){await deviceUnlockStore('delete');return;}
+ await deviceUnlockStore('put',{key:vault.key,salt:bytesToBase64(vault.salt),expires:state.rememberUntil,accountVersion:state.accountVersion});
+}
+async function connectMemory(password){
+ try{if(vault.exists)await vault.unlock(password);else await vault.create(password);
+   pendingMemoryPassword=null;await rememberMemory();
+ }catch(e){if(vault.unlocked){notice('Signed in. This browser could not remember private memory; use your login password to unlock it next time.',true);}else{pendingMemoryPassword=password;}}
+ refreshVault();
+}
 async function signIn(){
- const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify({remember:$('remember-device').checked}),cache:'no-store'});
+ const password=$('login-password').value;
+ const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$('login-username').value,password,remember:$('remember-device').checked}),cache:'no-store'});
  const data=await res.json();if(!res.ok)throw Error(data.error||'Sign in failed.');
- state.authenticated=true;$('passcode').value='';updateAuth();
+ state.authenticated=true;state.accountVersion=data.accountVersion;state.accountUsername=data.username;state.rememberUntil=data.rememberUntil;
+ $('login-password').value='';await deviceUnlockStore('delete').catch(()=>{});
+ await connectMemory(password);updateAuth();
+ if(pendingMemoryPassword)notice('Signed in. To keep your existing saved chats, enter their previous private-memory passphrase once. Future sign-ins will use your login password.',true);
 }
 function updateAuth(){
- $('passcode-wrap').hidden=!state.passcodeRequired||state.authenticated;
- $('signed-in-wrap').hidden=!state.authenticated;
+ const demo=Boolean(window.DELILAH_DEMO_ONLY);
+ $('login-screen').hidden=Boolean(state.authenticated)||demo;
+ $('app-shell').hidden=!state.authenticated&&!demo;
+ $('account-label').textContent=state.authenticated?'Signed in as '+(state.accountUsername||'Delilah'):'';
+ $('passcode-wrap').hidden=true;
 }
 async function requestJson(route,body){
- if(state.passcodeRequired&&!state.authenticated&&$('passcode').value&&$('remember-device').checked)await signIn();
-  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify(body),cache:'no-store'});
+  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});
   let data;try{data=await res.json();}catch{throw Error('The server returned an unreadable response.');}
-  if(!res.ok){if(res.status===401){state.authenticated=false;updateAuth();}throw Error(data.error||'The request failed.');}return data;
+  if(!res.ok){if(res.status===401){state.authenticated=false;vault.lock();await deviceUnlockStore('delete').catch(()=>{});refreshVault();updateAuth();$('login-error').textContent='Please sign in again.';}throw Error(data.error||'The request failed.');}return data;
 }
 async function analyze(){
   if(state.loading||!state.image)return;
@@ -612,11 +665,12 @@ async function generate(){
   }catch(e){notice(e.message||'Could not generate replies.',true);}finally{busy('generate',false);}
 }
 function download(name,text){const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
+async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(pendingMemoryPassword){await vault.changePassphrase(pendingMemoryPassword);pendingMemoryPassword=null;}await rememberMemory();if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
 async function status(){
   if(window.DELILAH_DEMO_ONLY){state.aiReady=false;updateStatus();return;}
-  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);state.authenticated=Boolean(d.authenticated);if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
-  catch{state.aiReady=false;state.passcodeRequired=false;}
+  try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);state.authenticated=Boolean(d.authenticated);state.accountVersion=d.accountVersion;state.accountUsername=d.username;
+ if(state.authenticated){try{const remembered=await deviceUnlockStore('get');if(remembered&&remembered.expires>Date.now()&&remembered.accountVersion===d.accountVersion){await vault.resume(remembered.key,remembered.salt);state.rememberUntil=d.rememberUntil||remembered.expires;await rememberMemory();}else await deviceUnlockStore('delete');}catch{await deviceUnlockStore('delete').catch(()=>{});}refreshVault();}else await deviceUnlockStore('delete').catch(()=>{});$('login-error').textContent='';if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
+  catch{state.aiReady=false;state.passcodeRequired=false;$('login-error').textContent='Unable to reach the app. Please try again shortly.';}
   updateStatus();
 }
 function updateStatus(){
@@ -632,9 +686,9 @@ function renderPrivateReferences(){const list=$('private-reference-list');list.r
 }
 function bind(){
  $('backup-locked-memory').onclick=()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup downloaded');}catch(e){notice(e.message,true);}};
- $('reset-locked-memory').onclick=async()=>{if(!confirm('Reset private memory on this device? This permanently deletes ALL saved buyer chats, settings, notes, creator playbook and personal references in this browser. An encrypted backup still requires your OLD passphrase. Your app sign-in and built-in references are not reset.'))return;try{state.requestVersion++;await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;$('vault-password').value='';clearResults();refreshVault();notice('Private memory reset. Choose a new passphrase of at least 10 characters and tap Create private memory.');$('vault-password').focus();}catch(e){notice(e.message,true);}};
- $('sign-in').onclick=async()=>{try{await signIn();toast($('remember-device').checked?'Signed in for 30 days':'Signed in for this browser session');}catch(e){notice(e.message,true);}};
- $('sign-out').onclick=async()=>{try{const res=await fetch('/api/logout',{method:'POST',cache:'no-store'});if(!res.ok)throw Error('Could not sign out. Try again.');state.authenticated=false;$('passcode').value='';updateAuth();toast('Signed out');}catch(e){notice(e.message,true);}};
+ $('reset-locked-memory').onclick=async()=>{if(!confirm('Reset private memory on this device? This permanently deletes ALL saved buyer chats, settings, notes, creator playbook and personal references in this browser. An encrypted backup still requires your OLD passphrase. Your app sign-in and built-in references are not reset.'))return;try{state.requestVersion++;await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;$('vault-password').value='';clearResults();refreshVault();notice('Private memory reset. Choose a new passphrase of at least 10 characters and tap Create private memory.');$('vault-password').focus();}catch(e){notice(e.message,true);}};
+ $('login-form').addEventListener('submit',async e=>{e.preventDefault();const button=$('login-submit');button.disabled=true;$('login-error').textContent='Signing in…';try{await signIn();$('login-error').textContent='';}catch(error){$('login-error').textContent=error.message;}finally{button.disabled=false;}});
+ $('sign-out').onclick=async()=>{try{const res=await fetch('/api/logout',{method:'POST',cache:'no-store'});if(!res.ok)throw Error('Could not sign out. Try again.');state.authenticated=false;pendingMemoryPassword=null;await deviceUnlockStore('delete').catch(()=>{});vault.lock();resetScreenshot();$('message').value='';$('notes').value='';state.activeBuyer=null;state.oneoff=true;clearResults();refreshVault();updateAuth();$('login-error').textContent='';}catch(e){notice(e.message,true);}};
  $('check-connection').onclick=async()=>{const button=$('check-connection');button.disabled=true;try{const result=await requestJson('/api/check',{});$('connection-check-result').textContent='AI connection verified · '+result.model+'. '+result.scope;}catch(e){$('connection-check-result').textContent=e.message;}finally{button.disabled=false;}};
 
  $('reference-new').onclick=clearReferenceEditor;
@@ -649,18 +703,18 @@ function bind(){
   ['length','objective','direction','energy','directness','emoji','profanity','smart-select'].forEach(id=>$(id).addEventListener('change',savePrefs));
   $('vault-auth-button').addEventListener('click',vaultAuth);
   $('vault-password').addEventListener('keydown',e=>{if(e.key==='Enter')vaultAuth();});
-  $('lock-vault').addEventListener('click',()=>{state.requestVersion++;vault.lock();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;clearResults();refreshVault();toast('Private memory locked');});
+  $('lock-vault').addEventListener('click',async()=>{await deviceUnlockStore('delete').catch(()=>{});state.requestVersion++;vault.lock();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;clearResults();refreshVault();toast('Private memory locked');});
   $('chat-search').addEventListener('input',renderBuyerChats);
   $('buyer-select').addEventListener('change',e=>{if(e.target.value)openSavedBuyer(e.target.value);else useOneoff();});
   $('save-buyer-notes').addEventListener('click',async()=>{try{await vault.setBuyerNotes(state.activeBuyer,$('buyer-notes').value);refreshVault();toast('Buyer notes encrypted and saved');}catch(e){notice(e.message,true);}});
   $('save-playbook').addEventListener('click',async()=>{try{await vault.setPlaybook($('playbook').value);toast('Playbook encrypted and saved');}catch(e){notice(e.message,true);}});
   $('export-vault').addEventListener('click',()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup exported');}catch(e){notice(e.message,true);}});
   $('import-vault').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;if(!confirm('Replace existing local buyer memory with the imported encrypted backup? Export a backup first if needed.'))return;
-    try{if(file.size>3_500_000)throw Error('Backup too large.');await vault.importEncrypted(await file.text());state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('Backup imported · unlock with its passphrase');}catch(error){notice(error.message,true);}finally{e.target.value='';}});
+    try{if(file.size>3_500_000)throw Error('Backup too large.');await deviceUnlockStore('delete').catch(()=>{});await vault.importEncrypted(await file.text());state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('Backup imported · unlock with its passphrase');}catch(error){notice(error.message,true);}finally{e.target.value='';}});
   $('delete-buyer').addEventListener('click',async()=>{if(!state.activeBuyer||!vault.unlocked)return;if(!confirm(`Permanently delete ${displayUsername(state.activeBuyer)} and all saved messages?`))return;
     try{await vault.removeBuyer(state.activeBuyer);useOneoff();toast('Buyer history erased');}catch(e){notice(e.message,true);}});
   $('erase-vault').addEventListener('click',async()=>{if(!confirm('Erase ALL encrypted buyer histories and the playbook on this device? This cannot be undone without a backup.'))return;
-    try{await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('All local buyer memory erased');}catch(e){notice(e.message,true);}});
+    try{await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('All local buyer memory erased');}catch(e){notice(e.message,true);}});
   $('image-input').addEventListener('change',e=>useFile(e.target.files?.[0]));
   $('remove-upload').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();resetScreenshot();clearResults();});
   const drop=$('dropzone');['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('dragging');}));

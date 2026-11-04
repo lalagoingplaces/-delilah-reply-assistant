@@ -17,6 +17,8 @@ const hostname=process.env.HOST||'127.0.0.1';
 const apiKey=process.env.OPENAI_API_KEY||'';
 const model=process.env.OPENAI_MODEL||'gpt-4.1-mini';
 const appPasscode=process.env.APP_PASSCODE||'';
+const appUsername=process.env.APP_USERNAME||'Delilah';
+const accountVersion=createHmac('sha256',appPasscode).update('account:'+appUsername.toLowerCase()).digest('hex');
 const publicServer=!(hostname==='127.0.0.1'||hostname==='localhost'||hostname==='::1');
 const strongPasscode=appPasscode.length>=12;
 const serverSetupIssue=publicServer&&!strongPasscode;
@@ -47,9 +49,9 @@ const analyzeSchema={
 };
 function json(res,status,body){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(body));}
 function secureEquals(a,b){const ba=Buffer.from(a||''),bb=Buffer.from(b||'');return ba.length===bb.length&&timingSafeEqual(ba,bb);}
-const sessionAge=30*24*60*60;
+const sessionAge=400*24*60*60;
 const sessionCookie='delilah_session';
-function sessionSignature(value){return createHmac('sha256',appPasscode).update('delilah-session-v1:'+value).digest('base64url');}
+function sessionSignature(value){return createHmac('sha256',appPasscode).update('delilah-session-v2:'+appUsername.toLowerCase()+':'+value).digest('base64url');}
 function hasSession(req){
  const token=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(sessionCookie+'='))?.slice(sessionCookie.length+1)||'';
  const parts=token.split('.');if(parts.length!==3||!strongPasscode)return false;
@@ -133,11 +135,12 @@ export const server=http.createServer(async(req,res)=>{
   if(req.method==='POST'&&path==='/api/login'){
    if(serverSetupIssue||!strongPasscode)return json(res,503,{error:'Server access is not configured.'});
    if(!limitRequest(req))return json(res,429,{error:'Too many attempts. Try again shortly.'});
-   if(!secureEquals(req.headers['x-delilah-passcode'],appPasscode))return json(res,401,{error:'Incorrect or missing server access passcode.'});
-   const body=await readJson(req),expires=Math.floor(Date.now()/1000)+sessionAge;
-   const value=expires+'.'+randomBytes(24).toString('base64url');
+   const body=await readJson(req);
+   if(!secureEquals(String(body.username||'').trim().toLowerCase(),appUsername.toLowerCase())||!secureEquals(body.password,appPasscode))return json(res,401,{error:'Username or password is incorrect.'});
+   const expires=Math.floor(Date.now()/1000)+sessionAge;
+   const value=expires+'.'+randomBytes(24).toString('base64url')+(body.remember===true?'-remember':'');
    setSessionCookie(res,value+'.'+sessionSignature(value),body.remember===true?sessionAge:undefined);
-   return json(res,200,{authenticated:true});
+   return json(res,200,{authenticated:true,username:appUsername,accountVersion,rememberUntil:body.remember===true?expires*1000:null});
   }
   if(req.method==='POST'&&path==='/api/logout'){setSessionCookie(res,'',0);return json(res,200,{authenticated:false});}
   if(req.method==='GET'&&path==='/api/references'){
@@ -146,7 +149,14 @@ export const server=http.createServer(async(req,res)=>{
    return json(res,200,{sources:catalog()});
   }
   if(req.method==='GET'&&path==='/health')return json(res,200,{ok:true});
-  if(req.method==='GET'&&path==='/api/status')return json(res,200,{aiReady,passcodeRequired:strongPasscode,authenticated:hasSession(req),serverSetupIssue});
+  if(req.method==='GET'&&path==='/api/status'){
+   const authenticated=hasSession(req);let rememberUntil=null;
+   if(authenticated&&(req.headers.cookie||'').split(';').some(c=>c.trim().startsWith(sessionCookie+'=')&&c.split('.')[1]?.endsWith('-remember'))){
+    const expires=Math.floor(Date.now()/1000)+sessionAge,value=expires+'.'+randomBytes(24).toString('base64url')+'-remember';
+    setSessionCookie(res,value+'.'+sessionSignature(value),sessionAge);rememberUntil=expires*1000;
+   }
+   return json(res,200,{aiReady,passcodeRequired:strongPasscode,authenticated,username:authenticated?appUsername:null,accountVersion:authenticated?accountVersion:null,rememberUntil,serverSetupIssue});
+  }
   if(req.method==='GET'&&(path==='/'||path==='/index.html')){const data=await readFile(join(root,'index.html'));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Cache-Control':'no-store'});return res.end(data);}
   if(req.method==='GET'&&path==='/sw.js'){res.writeHead(200,{'Content-Type':'application/javascript','Cache-Control':'no-store','Service-Worker-Allowed':'/'});return res.end(serviceWorker);}
   if(req.method==='GET'&&path==='/manifest.webmanifest')return json(res,200,manifest);

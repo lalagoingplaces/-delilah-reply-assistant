@@ -137,5 +137,8 @@ Checks: node --test test-references.mjs; node test-vault.mjs;
 node test-workflow.mjs. The workflow test uses a simulated DOM and is not visual
 browser testing. Live API, physical phone and hosted deployment remain untested.
 
-DEVICE SIGN-IN
-Enter the server access code and choose Remember this device to stay signed in for up to 30 days. The server sets a signed HttpOnly, SameSite cookie (Secure on public hosting); the access code is not saved in browser storage. Sign out clears the cookie. Changing APP_PASSCODE invalidates all device sessions. Private-memory encryption still has its own passphrase. Clearing browser data or using private browsing can require signing in again.
+ACCOUNT SIGN-IN
+The personal app opens at a username/password screen. Username defaults to Delilah; set APP_USERNAME on the server to customize it. The password is the existing APP_PASSCODE environment variable. Public self-registration and separate customer accounts are not enabled in this personal version.
+Remember me uses an HttpOnly, SameSite=Strict cookie (Secure on public hosting) renewed when the app opens, with a browser-compatible 400-day lifetime. Clearing browser data, signing out, credential changes, or browser policy can require sign-in again. No login password is saved in browser storage.
+New local buyer memory is automatically encrypted with the login password. A remembered device stores a nonextractable CryptoKey in IndexedDB, bound to the account credential version, vault salt and session expiry. It unlocks memory automatically only after a valid server session. Sign out or Lock memory clears the remembered key. Existing memory with another passphrase is preserved and asks for its old passphrase once; after successful unlock it is re-encrypted under the login password. An encrypted backup made before migration still requires its original passphrase.
+Private buyer histories remain local to this browser/device; this change does not add cloud synchronization or password recovery.
