@@ -447,9 +447,9 @@ function refreshVault(){
   renderPrivateReferences();
   const has=vault.exists,unlocked=vault.unlocked;
   $('vault-locked').hidden=unlocked;$('vault-unlocked').hidden=!unlocked;
-  $('vault-auth-button').textContent=has?'Unlock private memory':'Create private memory';
-  $('vault-auth-help').textContent=has?'Enter your passphrase to unlock. It is never uploaded or stored. If you lose it, stored histories cannot be recovered.':'Use at least 10 characters. Your passphrase cannot be recovered, so keep it somewhere safe.';
-  $('vault-state').textContent=unlocked?`Encrypted memory unlocked on this device · ${vault.list().length} buyer profile(s).`:has?'Memory locked. You can use one-off replies without unlocking.':'Create encrypted memory to preserve separate buyer histories, or use one-off mode.';
+  $('vault-auth-button').textContent=has?'Unlock older memory once':'Initialize device memory';
+  $('vault-auth-help').textContent=has?'Previous manual vault? Enter its old passphrase once to switch to automatic memory.':'Buyer memory starts automatically on this browser.';
+  $('vault-state').textContent=unlocked?`Always-on memory · ${vault.list().length} buyer profile(s) · 30-day inactivity cleanup`:has?'Previous protected vault: unlock once in Menu.':'Preparing automatic device memory…';
   const select=$('buyer-select'),chosen=state.activeBuyer;
   select.replaceChildren();const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Choose a saved buyer…';select.append(placeholder);
   if(unlocked){
@@ -511,26 +511,27 @@ async function useFile(file){if(!file)return;try{
     resetScreenshot();state.previousGenerated=null;$('voice-revision').hidden=true;state.requestVersion++;state.image=data;state.imageUrl=url;state.identityPending=true;resetStyleChoice();
     // A new screenshot is a new message. Never carry another buyer's text across uploads.
     $('message').value='';$('notes').value='';showSwitchAlert('');
-    $('preview-image').src=url;$('upload-filename').textContent=(file.name||'Screenshot').slice(0,70);$('upload-preview').hidden=false;$('empty-upload').hidden=true;$('screenshot-summary').textContent='Screenshot selected. Buyer detection will start if live AI is connected.';
-    if(!state.aiReady)notice('Preview ready. Demo mode cannot interpret image contents. Paste a message and manually confirm the buyer to try sample replies.');
-    else notice('Reading buyer name automatically. You can still review every setting before generating replies.');
+    $('preview-image').src=url;$('upload-filename').textContent=(file.name||'Screenshot').slice(0,70);$('upload-preview').hidden=false;$('empty-upload').hidden=true;$('screenshot-summary').textContent='Screenshot selected. AI starts automatically after sign-in.';$('upload-state').textContent=state.passcodeRequired?'Sign in to analyze':'Reading screenshot…';
+    if(!state.aiReady)notice('AI not connected. You can still dictate and copy your own words.');
+    else notice(state.passcodeRequired?'Sign in once above; AI will then read this screenshot automatically.':'Reading the screenshot automatically…');
     clearResults();refreshIdentity();busy('',false);
-    if(state.aiReady)await analyze();
+    if(state.aiReady&&!state.passcodeRequired)await analyze();
   }catch(e){notice(e.message,true);}}
 async function requestJson(route,body){
-  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value},body:JSON.stringify(body),cache:'no-store'});
+  const res=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','x-delilah-passcode':$('passcode').value||$('quick-passcode').value},body:JSON.stringify(body),cache:'no-store',credentials:'same-origin'});
   let data;try{data=await res.json();}catch{throw Error('The server returned an unreadable response.');}
   if(!res.ok)throw Error(data.error||'The request failed.');return data;
 }
 async function analyze(){
   if(state.loading||!state.image)return;
-  if(!state.aiReady){notice('Screenshot analysis requires live AI. Paste the buyer’s message and manually select their chat for demo mode.',true);return;}
+  if(!state.aiReady){notice('Screenshot analysis requires live AI.',true);return;}
+  if(state.passcodeRequired){$('inline-access').hidden=false;notice('Enter your private app passcode above once to analyze this screenshot.',true);return;}
   const analyzedImage=state.image,version=state.requestVersion;
-  busy('analyze',true);let shouldAutoGenerate=false;
+  busy('analyze',true);$('upload-state').textContent='Analyzing screenshot…';let shouldAutoGenerate=false;
   try{
     const result=await requestJson('/api/analyze',{image:analyzedImage});
     if(version!==state.requestVersion||analyzedImage!==state.image)return;
-    state.analysis=result;
+    state.analysis=result;$('upload-state').textContent='Screenshot analyzed';
     const assessed=assessIdentity(state.activeBuyer&&!state.oneoff?state.activeBuyer:null,result);
     state.pendingBuyer=assessed.status==='same'?null:assessed.proposed;
     state.pendingDisplay=cleanDisplayHandle(result.display_username)||cleanDisplayHandle(result.buyer_username)||assessed.proposed;
@@ -560,8 +561,8 @@ async function analyze(){
     }
     if(result.age_concern)notice('Possible age or consent concern detected. Replies must stay non-flirtatious and establish appropriate boundaries.',true);
     clearResults();refreshIdentity();
-    shouldAutoGenerate=!state.identityPending&&Boolean($('message').value.trim());
-  }catch(e){if(version===state.requestVersion)notice(e.message||'Could not analyze screenshot.',true);}
+    shouldAutoGenerate=!state.identityPending&&Boolean($('message').value.trim()||result.conversation_excerpt);
+  }catch(e){if(version===state.requestVersion){$('upload-state').textContent='Analysis failed — retry';if(/sign in/i.test(e.message||'')){state.passcodeRequired=true;updateStatus();}notice(e.message||'Could not analyze screenshot.',true);}}
   finally{busy('',false);}
   if(shouldAutoGenerate&&analyzedImage===state.image)await generate();
 }
@@ -656,16 +657,44 @@ async function generate(){
   }catch(e){notice(e.message||'Could not generate replies.',true);}finally{busy('generate',false);}
 }
 function download(name,text){const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
-async function vaultAuth(){const pass=$('vault-password').value;try{if(vault.exists)await vault.unlock(pass);else await vault.create(pass);if(state.activeBuyer&&!state.oneoff)await vault.ensureBuyer(state.analysis?.display_username||state.analysis?.buyer_username||state.activeBuyer);$('vault-password').value='';refreshVault();toast('Private memory unlocked');}catch(e){notice(e.message,true);}}
+function getDeviceSecret(){
+  let secret=localStorage.getItem(DEVICE_MEMORY_KEY);
+  if(!secret){secret=bytesToBase64(crypto.getRandomValues(new Uint8Array(32)))+'DelilahDevice';localStorage.setItem(DEVICE_MEMORY_KEY,secret);}
+  return secret;
+}
+async function openMemory(){
+  try{
+    const secret=getDeviceSecret();
+    if(vault.exists)await vault.unlock(secret);else await vault.create(secret);
+    const removed=await vault.pruneInactive();
+    refreshVault();
+    if(removed)toast(removed+' inactive buyer chat(s) removed after 30 days');
+    return true;
+  }catch(e){
+    refreshVault();
+    if(vault.exists)$('vault-auth-help').textContent='Previous passphrase-protected memory found. Open Menu and enter its old passphrase once to switch to automatic memory.';
+    else notice('Automatic buyer memory unavailable: '+e.message,true);
+    return false;
+  }
+}
+async function vaultAuth(){
+  const pass=$('vault-password').value;
+  try{
+    if(vault.exists)await vault.unlock(pass);else await vault.create(getDeviceSecret());
+    await vault.rotateToDeviceKey(getDeviceSecret());await vault.pruneInactive();
+    $('vault-password').value='';refreshVault();toast('Always-on buyer memory ready');
+  }catch(e){notice(e.message,true);}
+}
 async function status(){
   if(window.DELILAH_DEMO_ONLY){state.aiReady=false;updateStatus();return;}
   try{const result=await fetch('/api/status',{cache:'no-store'});if(!result.ok)throw Error('not ready');const d=await result.json();state.aiReady=Boolean(d.aiReady);state.passcodeRequired=Boolean(d.passcodeRequired);if(d.aiReady)$('status-text').title='Server configured; use Test AI connection to verify a real request.';if(d.serverSetupIssue)notice('Server needs a strong APP_PASSCODE before public AI can be enabled.',true);}
   catch{state.aiReady=false;state.passcodeRequired=false;}
   updateStatus();
+  if(state.aiReady&&!state.passcodeRequired&&state.image&&!state.analysis&&!state.loading)await analyze();
 }
 function updateStatus(){
-  $('status-text').textContent=state.aiReady?'Live AI ready':'Demo only';$('connection-status').classList.toggle('ai',state.aiReady);
-  $('passcode-wrap').hidden=!state.passcodeRequired;
+  $('status-text').textContent=state.aiReady?(state.passcodeRequired?'Sign in once':'AI ready'):'Demo only';$('connection-status').classList.toggle('ai',state.aiReady);
+  $('passcode-wrap').hidden=!state.passcodeRequired;$('inline-access').hidden=!(state.aiReady&&state.passcodeRequired);
   $('generate-label').textContent=state.aiReady?'Generate 2 AI replies':'Try 2 demo replies';
   if(!state.image)notice(state.aiReady?'Live AI is connected. Uploaded screenshots are analyzed automatically; no automatic FeetFinder access.':'Demo mode: paste text for sample replies. Live screenshot reading needs a server with an OpenAI API key.');
 }
@@ -696,7 +725,18 @@ function bind(){
      recognition.onerror=e=>{$('voice-status').textContent='Microphone unavailable ('+e.error+'). You can still type.';};
      recognition.start();}catch(e){$('voice-status').textContent='Could not start microphone. Try keyboard dictation or type.';}
  });
- $('login-session').onclick=async()=>{try{await requestJson('/api/login',{});$('passcode').value='';$('passcode-wrap').hidden=true;toast('Signed in on this browser for up to 30 days');}catch(e){notice(e.message,true);}};
+ async function signInAndContinue(){
+    if(!$('quick-passcode').value.trim()&&!$('passcode').value.trim())return notice('Enter your app access passcode once.',true);
+    try{
+      await requestJson('/api/login',{});
+      $('passcode').value='';$('quick-passcode').value='';
+      state.passcodeRequired=false;updateStatus();
+      toast('App signed in on this phone');
+      await status();
+    }catch(e){notice(e.message,true);}
+  }
+  $('login-session').onclick=signInAndContinue;
+  $('quick-signin-btn').addEventListener('click',signInAndContinue);
  $('check-connection').onclick=async()=>{const button=$('check-connection');button.disabled=true;try{const result=await requestJson('/api/check',{});$('connection-check-result').textContent='AI connection verified · '+result.model+'. '+result.scope;}catch(e){$('connection-check-result').textContent=e.message;}finally{button.disabled=false;}};
 
  $('reference-new').onclick=clearReferenceEditor;
@@ -708,12 +748,12 @@ function bind(){
  $('confirm-style').addEventListener('click',()=>{state.styleConfirmed=true;$('confirm-style').hidden=true;$('style-status').textContent='Updated settings confirmed for this screenshot.';});
 
   document.querySelectorAll('[data-group="personality"],[data-group="intensity"]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.group,b.dataset.value)));
-  ['length','objective','direction','energy','directness','emoji','profanity','smart-select'].forEach(id=>$(id).addEventListener('change',savePrefs));
+  ['length','objective','direction','energy','directness','emoji','profanity','smart-select'].forEach(id=>$(id).addEventListener('change',savePrefs));$('include-history').checked=true;$('save-incoming').checked=true;
   $('vault-auth-button').addEventListener('click',vaultAuth);
   $('vault-password').addEventListener('keydown',e=>{if(e.key==='Enter')vaultAuth();});
-  $('lock-vault').addEventListener('click',()=>{state.requestVersion++;vault.lock();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;clearResults();refreshVault();toast('Private memory locked');});
+  $('lock-vault').addEventListener('click',()=>toast('Buyer memory is always on. Delete individual chats from the menu.'));
   $('chat-search').addEventListener('input',renderBuyerChats);
-  $('buyer-select').addEventListener('change',e=>{if(e.target.value)openSavedBuyer(e.target.value);else useOneoff();});
+  $('buyer-select').addEventListener('change',e=>{if(e.target.value)openSavedBuyer(e.target.value);});
   $('save-buyer-notes').addEventListener('click',async()=>{try{await vault.setBuyerNotes(state.activeBuyer,$('buyer-notes').value);refreshVault();toast('Buyer notes encrypted and saved');}catch(e){notice(e.message,true);}});
   $('save-playbook').addEventListener('click',async()=>{try{await vault.setPlaybook($('playbook').value);toast('Playbook encrypted and saved');}catch(e){notice(e.message,true);}});
   $('export-vault').addEventListener('click',()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup exported');}catch(e){notice(e.message,true);}});
@@ -722,7 +762,7 @@ function bind(){
   $('delete-buyer').addEventListener('click',async()=>{if(!state.activeBuyer||!vault.unlocked)return;if(!confirm(`Permanently delete ${displayUsername(state.activeBuyer)} and all saved messages?`))return;
     try{await vault.removeBuyer(state.activeBuyer);useOneoff();toast('Buyer history erased');}catch(e){notice(e.message,true);}});
   $('erase-vault').addEventListener('click',async()=>{if(!confirm('Erase ALL encrypted buyer histories and the playbook on this device? This cannot be undone without a backup.'))return;
-    try{await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();refreshVault();toast('All local buyer memory erased');}catch(e){notice(e.message,true);}});
+    try{await vault.eraseAll();localStorage.removeItem(DEVICE_MEMORY_KEY);state.activeBuyer=null;state.oneoff=true;state.identityPending=false;clearResults();await openMemory();toast('Buyer records erased; automatic memory stays on');}catch(e){notice(e.message,true);}});
   $('image-input').addEventListener('change',e=>useFile(e.target.files?.[0]));
   $('remove-upload').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();resetScreenshot();clearResults();});
   const drop=$('dropzone');['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('dragging');}));
@@ -730,15 +770,15 @@ function bind(){
   document.addEventListener('paste',e=>{if(e.target.matches('textarea,input'))return;const file=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));if(file){e.preventDefault();useFile(file);}});
   $('analyze').addEventListener('click',analyze);
   $('clear-chat').addEventListener('click',()=>{resetScreenshot();state.requestVersion++;$('message').value='';$('notes').value='';state.identityPending=false;clearResults();refreshIdentity();showSwitchAlert('');notice('Current screenshot and text cleared from this page. Encrypted saved history was not deleted.');});
-  $('confirm-detected').addEventListener('click',async()=>{await activateBuyer(state.pendingDisplay||state.pendingBuyer,state.analysis?.confidence!=='high');if(state.image&&$('message').value.trim())await generate();});
-  $('confirm-current').addEventListener('click',async()=>{await activateBuyer(state.activeBuyer,true);if(state.image&&$('message').value.trim())await generate();});
-  $('use-oneoff').addEventListener('click',useOneoff);
-  $('use-manual').addEventListener('click',()=>activateBuyer($('manual-username').value,true));
+  $('confirm-detected').addEventListener('click',async()=>{const chosen=await activateBuyer(state.pendingDisplay||state.pendingBuyer,state.analysis?.confidence!=='high');if(chosen&&state.image&&($('message').value.trim()||state.analysis?.conversation_excerpt))await generate();});
+  $('confirm-current').addEventListener('click',async()=>{const chosen=await activateBuyer(state.activeBuyer,true);if(chosen&&state.image&&($('message').value.trim()||state.analysis?.conversation_excerpt))await generate();});
+  $('use-oneoff').addEventListener('click',()=>notice('Buyer memory stays on. Confirm the buyer username to continue.',true));
+  $('use-manual').addEventListener('click',async()=>{const chosen=await activateBuyer($('manual-username').value,true);if(chosen&&state.analysis&&($('message').value.trim()||state.analysis.conversation_excerpt))await generate();});
   $('load-sample').addEventListener('click',()=>{resetScreenshot();$('message').value='Hey, I like your sense of humor. What have you been up to?';$('notes').value='Demo example only. This is an adult buyer.';state.identityPending=false;clearResults();refreshIdentity();toast('Sample message loaded');});
   $('generate').addEventListener('click',generate);$('regenerate').addEventListener('click',generate);
   $('message').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')generate();});
 }
-loadPrefs();refreshVault();bind();status();
+loadPrefs();bind();openMemory().then(()=>status());
 if(!window.DELILAH_DEMO_ONLY&&location.protocol==='https:'&&'serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();
 
