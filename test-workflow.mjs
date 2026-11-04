@@ -8,7 +8,7 @@ const elements=new Map([...ids].map(id=>[id,{value:'',checked:false,hidden:false
 const doc={getElementById(id){assert(ids.has(id),'Missing control '+id);return elements.get(id);},querySelectorAll(){return [];},addEventListener(){},createElement(){return {append(){},addEventListener(){}};}};
 const storage=new Map();const localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)};
 let script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
-script=script.replace('loadPrefs();refreshVault();bind();status();','window.hooks={state,values,applySettings,resetStyleChoice,bind};');
+script=script.replace('loadPrefs();bind();openMemory().then(()=>status());','window.hooks={state,values,applySettings,resetStyleChoice,bind};');
 const window={localStorage};
 vm.runInNewContext(script,{window,document:doc,location:{protocol:'http:'},navigator:{},localStorage,crypto:webcrypto,TextEncoder,TextDecoder,Uint8Array,ArrayBuffer,atob,btoa,structuredClone,console,setTimeout,clearTimeout});
 const h=window.hooks;h.applySettings({personality:'spicy',smartSelect:true,profanity:'strong'});h.bind();
@@ -16,6 +16,13 @@ h.state.image='repeat-screenshot';h.resetStyleChoice();assert.equal(h.state.styl
 assert.equal(elements.get('style-question').hidden,true);
 assert(ids.has('voice-revision')&&ids.has('voice-mic')&&ids.has('voice-command')&&ids.has('voice-apply'));
 assert(ids.has('nav-menu'));
+assert(ids.has('quick-mic')&&ids.has('quick-copy')&&ids.has('quick-polish')&&ids.has('quick-draft'));
+assert(ids.has('inline-access')&&ids.has('quick-signin-btn'));
+assert(html.includes('pruneInactive(days=30')&&html.includes('openMemory().then(()=>status())'));
+assert(html.includes('padding-top:max(94px')&&html.includes('inset-top'));
+assert(html.includes('id="use-oneoff" class="subtle-button" hidden'));
+assert(html.includes('id="save-incoming" checked hidden'));
+
 assert.equal((html.match(/class="persona-option"/g)||[]).length,7);
 assert(!html.match(/<details id="advanced-settings"[^>]*\sopen/));
-console.log('PASS: automatic style gate, voice controls, two-column personality selector, menu and collapsed advanced controls (simulated DOM).');
+console.log('PASS: always-on memory startup, mobile-safe menu, one-time sign-in, speech controls, and flexible reply styles (simulated DOM).');
