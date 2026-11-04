@@ -703,7 +703,7 @@ function renderPrivateReferences(){const list=$('private-reference-list');list.r
 }
 function bind(){
  $('delete-open-buyer').onclick=()=>$('delete-buyer').click();
- let autosaveTimer; $('message').addEventListener('input',()=>{clearTimeout(autosaveTimer);autosaveTimer=setTimeout(autosaveBuyerMessage,700);});$('message').addEventListener('blur',autosaveBuyerMessage);
+ let autosaveTimer; $('message').addEventListener('input',()=>{clearTimeout(autosaveTimer);const owner=state.activeBuyer,version=state.requestVersion;autosaveTimer=setTimeout(()=>{if(owner===state.activeBuyer&&version===state.requestVersion)autosaveBuyerMessage();},700);});$('message').addEventListener('blur',autosaveBuyerMessage);
 
  $('backup-locked-memory').onclick=()=>{try{download('Delilah_Encrypted_Buyer_Backup.json',vault.exportEncrypted());toast('Encrypted backup downloaded');}catch(e){notice(e.message,true);}};
  $('reset-locked-memory').onclick=async()=>{if(!confirm('Reset private memory on this device? This permanently deletes ALL saved buyer chats, settings, notes, creator playbook and personal references in this browser. An encrypted backup still requires your OLD passphrase. Your app sign-in and built-in references are not reset.'))return;try{state.requestVersion++;await deviceUnlockStore('delete').catch(()=>{});await vault.eraseAll();state.activeBuyer=null;state.oneoff=true;state.identityPending=Boolean(state.image);state.pendingBuyer=null;$('vault-password').value='';clearResults();refreshVault();notice('Private memory reset. Choose a new passphrase of at least 10 characters and tap Create private memory.');$('vault-password').focus();}catch(e){notice(e.message,true);}};
