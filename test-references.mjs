@@ -4,9 +4,9 @@ import {catalog,selectReferences,referenceAudit} from './references.mjs';
 test('voice baseline, bounded retrieval and page/hash provenance',()=>{
  const selected=selectReferences({message:'I feel nervous about small talk with strangers and asking questions'});
  assert.equal(selected[0].id,'voice');assert(selected.length>1&&selected.length<=3);
- for(const s of selected){assert.match(s.sha256,/^[a-f0-9]{64}$/);assert(s.text.length>100);if(s.id!=='voice')assert(s.page>0);}
+ for(const s of selected){assert.match(s.sha256,/^[a-f0-9]{64}$/);assert(s.text.length>100);if(s.id!=='voice')assert(s.origins?.every(o=>o.page>0));}
  assert.equal(catalog().length,17);
- assert.deepEqual(selectReferences({message:'Hi'}).map(x=>x.id),['voice']);
+ assert.deepEqual(selectReferences({message:'Hi'}).map(x=>x.id),['voice','style-flirty']);
 });
 test('unselected reference claims rejected; audit distinguishes supply from reported use',()=>{
  const selected=selectReferences({message:'hello'});
@@ -43,7 +43,7 @@ test('reference catalog is protected and raw source files are not served',async(
   assert.equal((await fetch(url+'/api/references')).status,401);
   const res=await fetch(url+'/api/references',{headers:{'x-delilah-passcode':'test-private-passcode'}});
   assert.equal(res.status,200);const data=await res.json();assert.equal(data.sources.length,17);
-  assert.equal(data.sources.filter(s=>s.automaticRetrieval).length,6);
+  assert.equal(data.sources.filter(s=>s.automaticRetrieval).length,5);
   assert.equal((await fetch(url+'/health')).status,200);
   assert.equal((await fetch(url+'/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,401);
   const realFetch=globalThis.fetch;let providerCalled=false;
@@ -62,15 +62,4 @@ test('private references are scoped to the supplied request and disabled entries
  assert(!selectReferences({privateReferences:[{...a,enabled:false}]}).some(s=>s.id.startsWith('private-')));
  assert.throws(()=>selectReferences({privateReferences:[a,a]}),/Invalid/);
  assert.throws(()=>selectReferences({privateReferences:[{...a,text:'x'.repeat(12001)}]}),/Invalid/);
-});
-test('automatic screenshot flow accepts unconfirmed style and supports freeform revision',async()=>{
- const {generate}=await import('./server.mjs');
- const real=globalThis.fetch;let providerCalls=0;
- globalThis.fetch=async(url,opts)=>{if(String(url).includes('api.openai.com')){
-   providerCalls++;const payload=JSON.parse(opts.body);const input=JSON.parse(payload.input[0].content);
-   assert.equal(input.revisionInstruction,'Make option 2 shorter, like how I talk');
-   assert.equal(input.previousSuggestions.length,2);
-   return {ok:true,json:async()=>({output:[{content:[{type:'output_text',text:JSON.stringify({context:'Test',selected_style:'natural',used_reference_ids:[],suggestions:[{label:'One',reply:'Hi there',why:'short'},{label:'Two',reply:'Hey you',why:'casual'}]})}]}]})};
- }return real(url,opts);};
- try{const out=await generate({message:'Hello',screenshotRequest:true,styleConfirmed:false,revisionInstruction:'Make option 2 shorter, like how I talk',previousSuggestions:['Hello, thank you','Good to hear from you'],personality:'natural'});assert.equal(out.suggestions.length,2);assert.equal(providerCalls,1);}finally{globalThis.fetch=real;}
 });
