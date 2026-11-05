@@ -142,7 +142,7 @@ body:not(.show-advanced) .hero{padding:23px 0 18px}body:not(.show-advanced) .her
           </details><button type="button" id="confirm-style" class="small-primary" hidden>Confirm settings</button>
           <div class="passcode-wrap" id="passcode-wrap" hidden><label class="field-label" for="passcode">Server access passcode</label><input type="password" id="passcode" autocomplete="off" placeholder="Enter the private server passcode"><small>Enter once to remember this browser for up to 30 days. The passcode itself is not saved in page storage.</small><button type="button" id="login-session" class="small-primary">Sign in &amp; remember this browser</button><button type="button" id="check-connection" class="subtle-button">Test AI connection</button><p id="connection-check-result" class="micro-copy">Uses a small billable AI request with synthetic text, never your buyer chats.</p></div>
           <button type="button" class="generate" id="generate"><span id="generate-icon">✦</span><span id="generate-label">Generate 2 replies</span><span class="generate-arrow">↗</span></button>
-          <p class="fineprint">A human reviews and sends all replies. Copied replies add <b>#AI</b> disclosure.</p>
+          <p class="fineprint">Review and edit each suggested reply before sending.</p>
         </section>
         <section class="panel results-panel" aria-labelledby="results-title"><div class="panel-top"><div><span class="step">03 / READY TO SEND</span><h2 id="results-title">Two ways to say it.</h2></div><span class="panel-icon">✦</span></div><p class="section-helper">Both suggestions respond to the actual message in Delilah's natural voice. Copy one, edit it if needed, and send it yourself.</p><div class="notice" id="notice" role="status" aria-live="polite" hidden></div><div class="empty-results" id="empty-results"><div class="empty-orb"><span>♡</span></div><div class="empty-title">Replies with her personality.</div><p>Add a screenshot to generate two replies automatically. You can also paste a message.</p><span class="empty-sparkles">✧ &nbsp; ✦ &nbsp; ✧</span></div><div class="context-note" id="context-wrap" hidden><b>Conversation read</b><span id="context-text"></span></div><div class="results" id="results" hidden></div><details id="reference-audit" class="privacy-details" hidden><summary>References supplied for these replies</summary><p class="micro-copy">Supplied means included in this request. AI-reported use is self-reported, not proof of influence.</p><div id="reference-sources"></div></details><div class="results-bottom" id="results-bottom" hidden><button type="button" class="regenerate" id="regenerate">↻ &nbsp; Two new versions</button><p>Copy does not send a FeetFinder message. Mark sent only after you have actually sent it.</p></div>
           <section class="voice-revision" id="voice-revision" hidden aria-label="Change reply style or dictate your own message">
@@ -244,9 +244,8 @@ function validateSuggestions(response) {
     suggestions:arr.map(s=>({label:s.label.slice(0,65),reply:s.reply.trim().slice(0,1200),why:s.why.slice(0,200)}))
   };
 }
-function disclosureText(reply) {
-  const clean=String(reply||'').trim();
-  return /(?:^|\n)\s*#(?:AI|AIGenerated)\s*$/i.test(clean)?clean:`${clean}\n\n#AI`;
+function replyText(reply) {
+  return String(reply||'').trim();
 }
 function trimmedHistory(items) {
   if(!Array.isArray(items))return [];
@@ -596,12 +595,12 @@ function renderReplies(data,isDemo=false){
     sent.title=sent.disabled?'Requires live AI and unlocked selected-buyer memory':'Only tap after you have actually sent this message';
     sent.addEventListener('click',async()=>{
       if(!vault.unlocked||!state.generationBuyer||state.generationBuyer!==state.activeBuyer||state.oneoff)return notice('Select the correct buyer and unlock memory first.',true);
-      try{await vault.markSent(state.generationBuyer,disclosureText(option.reply));sent.disabled=true;sent.classList.add('sent');sent.textContent='Marked sent ✓';refreshVault();toast('Saved as sent to '+displayUsername(state.generationBuyer));}
+      try{await vault.markSent(state.generationBuyer,replyText(option.reply));sent.disabled=true;sent.classList.add('sent');sent.textContent='Marked sent ✓';refreshVault();toast('Saved as sent to '+displayUsername(state.generationBuyer));}
       catch(e){notice(e.message,true);}
     });
     actions.append(copy,sent);foot.append(reason,actions);card.append(head,reply,foot);container.append(card);
   });
-  notice(isDemo?'DEMO ONLY: these are fixed sample templates, NOT screenshot analysis or real AI replies.':'Two live AI suggestions. Read and edit before sending; copied messages include #AI disclosure.');
+  notice(isDemo?'DEMO ONLY: these are fixed sample templates, NOT screenshot analysis or real AI replies.':'Two live AI suggestions. Read and edit before sending.');
   if(window.innerWidth<900)$('results-title').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderReferenceAudit(audit,isDemo){
@@ -616,11 +615,11 @@ function renderReferenceAudit(audit,isDemo){
     item.append(summary,reason,passage,identity);list.append(item);
   }
 }
-async function copyText(text){const output=disclosureText(text);try{
+async function copyText(text){const output=replyText(text);try{
     if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(output);
     else {const temp=document.createElement('textarea');temp.value=output;temp.style.position='fixed';temp.style.opacity='0';document.body.append(temp);temp.select();if(!document.execCommand('copy'))throw Error('Copy blocked');temp.remove();}
-    toast('Copied with #AI disclosure');
-  }catch{notice('Copy was blocked. Select the reply and copy it manually, including #AI.',true);}}
+    toast('Reply copied');
+  }catch{notice('Copy was blocked. Select the reply and copy it manually.',true);}}
 async function generate(){
   if(state.loading)return;
   
